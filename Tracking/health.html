@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ZENFIT Health — Track your sleep, BMI, weight, yoga, and nutrition metrics.">
+  <title>ZENFIT — Health</title>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/health.css">
+</head>
+<body>
+
+  <!-- ===== SIDEBAR BACKDROP (Mobile) ===== -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===== SIDEBAR (Drawer & Desktop Layout) ===== -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Brand Logo at Top of Sidebar -->
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-group">
+        <div class="sidebar-logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <span class="sidebar-logo-text">ZENFIT</span>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="#" class="nav-item" id="nav-routes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+        <span>Routes</span>
+      </a>
+
+
+      <a href="personal_details.html" class="nav-item" id="nav-personal-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21a8 8 0 0 0-16 0"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Personal Details</span>
+      </a>
+
+      <a href="#" class="nav-item" id="nav-goals">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+        <span>Goals</span>
+      </a>
+
+      <a href="#" class="nav-item" id="nav-aicoach">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+        </svg>
+        <span>AI Coach</span>
+      </a>
+
+      <a href="#" class="nav-item" id="nav-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-2.82.33 1.65 1.65 0 0 0-.1 1.51 2 2 0 0 1-1.4 2.65 2 2 0 0 1-2.5-1.4 1.65 1.65 0 0 0-1.51-.1 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-2.82 1.65 1.65 0 0 0-1.51-.1 2 2 0 0 1-2.65-1.4 2 2 0 0 1 1.4-2.5 1.65 1.65 0 0 0 .1-1.51 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 2.82-.33 1.65 1.65 0 0 0 .1-1.51 2 2 0 0 1 1.4-2.65 2 2 0 0 1 2.5 1.4 1.65 1.65 0 0 0 1.51.1 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 2.82 1.65 1.65 0 0 0 1.51.1 2 2 0 0 1 2.65 1.4 2 2 0 0 1-1.4 2.5 1.65 1.65 0 0 0-.1 1.51z"></path>
+        </svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-profile-lower">
+      <div class="profile-avatar" id="sidebarAvatar">AK</div>
+      <div class="profile-details">
+        <span class="profile-name" id="sidebarUserName">Akshay Kumar</span>
+        <span class="profile-badge">👑 Pro Member 👋</span>
+      </div>
+    </div>
+
+    <!-- Weekly Progress Stats -->
+    <div class="sidebar-weekly">
+      <div class="weekly-stats">
+        <div class="weekly-stat">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+          </svg>
+          <div>
+            <div class="weekly-stat-label">Streak</div>
+            <div class="weekly-stat-value">7 Days</div>
+          </div>
+        </div>
+        <div class="weekly-stat">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          <div>
+            <div class="weekly-stat-label">Level</div>
+            <div class="weekly-stat-value">12</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Out -->
+    <button class="logout-btn" id="logoutBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Log Out</span>
+    </button>
+  </aside>
+
+  <!-- ===== MAIN CONTENT AREA ===== -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="icon-btn-hamburger" id="hamburgerBtn" aria-label="Toggle Sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="header-title-group">
+          <h1 class="header-title">
+            Health
+            <span class="purple-heart-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </span>
+          </h1>
+          <p class="header-subtitle">Track your health, build a better you</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Brand logo icon & text -->
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-group">
+            <div class="sidebar-logo-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <span class="sidebar-logo-text">ZENFIT</span>
+          </div>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+
+        <!-- User Profile Avatar Badge -->
+        <div class="header-avatar" id="userAvatarBadge">
+          <span id="userAvatarBadgeText">AK</span>
+          <span class="online-dot"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Health Dashboard Grid -->
+    <div class="health-dashboard-grid">
+
+      <!-- ========================================
+           CARD 1: SLEEP & SLEEP GRAPH
+           ======================================== -->
+      <section class="health-card sleep-card">
+        <!-- Sleep Top Summary Header -->
+        <div class="sleep-top-summary">
+          <div class="card-header-left sleep-metric-box left">
+            <div class="card-icon-badge purple">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </div>
+            <span class="card-title">Sleep</span>
+          </div>
+
+          <div class="sleep-metric-box">
+            <div class="sleep-metric-label">Total</div>
+            <div class="sleep-metric-value">8h 12m</div>
+            <div class="sleep-metric-subtext">Total Sleep</div>
+          </div>
+
+          <div class="sleep-metric-box">
+            <div class="sleep-metric-label">Required</div>
+            <div class="sleep-metric-value">7h – 9h</div>
+            <div class="sleep-metric-subtext">Recommended</div>
+          </div>
+        </div>
+
+        <!-- Sleep Graph Section -->
+        <div class="sleep-graph-header">
+          <div class="card-header-left">
+            <div class="card-icon-badge purple" style="width:32px; height:32px; border-radius:8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <span class="card-title" style="font-size:1rem;">Sleep Graph</span>
+          </div>
+
+          <button class="dropdown-pill" id="sleepTimeframeBtn">
+            <span>This Week</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sleep Chart SVG Render Target -->
+        <div class="sleep-chart-container" id="sleepChartContainer"></div>
+
+        <!-- X-Axis Days Footer -->
+        <div class="x-axis-labels">
+          <span class="x-axis-day">Mon</span>
+          <span class="x-axis-day">Tue</span>
+          <span class="x-axis-day">Wed</span>
+          <span class="x-axis-day">Thu</span>
+          <span class="x-axis-day">Fri</span>
+          <span class="x-axis-day">Sat</span>
+          <span class="x-axis-day active">Sun</span>
+        </div>
+      </section>
+
+      <!-- ========================================
+           MIDDLE ROW: HEIGHT, WEIGHT, BMI (3 CARDS)
+           ======================================== -->
+      <div class="middle-grid">
+
+        <!-- Height Card -->
+        <section class="health-card">
+          <div class="metric-card-header">
+            <div class="card-icon-badge purple">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+            </div>
+            <span class="card-title">Height</span>
+          </div>
+
+          <div>
+            <span class="big-stat-val" id="heightValueText">175</span>
+            <span class="big-stat-unit">cm</span>
+          </div>
+
+          <!-- Interactive Ruler Slider -->
+          <div class="height-ruler-wrapper">
+            <div class="height-floating-badge" id="heightFloatingBadge">175</div>
+            <div class="ruler-track" id="rulerTrack"></div>
+            <div class="ruler-ticks" id="rulerTicks">
+              <div class="ruler-tick major"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick major"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick major active"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick major"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick minor"></div>
+              <div class="ruler-tick major"></div>
+            </div>
+            <div class="ruler-labels">
+              <span>150</span>
+              <span>160</span>
+              <span>170</span>
+              <span>180</span>
+              <span>190</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Weight Card -->
+        <section class="health-card">
+          <div class="metric-card-header">
+            <div class="card-icon-badge green">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <span class="card-title">Weight</span>
+          </div>
+
+          <div>
+            <span class="big-stat-val" id="weightValueText">72.0</span>
+            <span class="big-stat-unit">kg</span>
+          </div>
+
+          <!-- Weight Sparkline SVG -->
+          <div class="weight-sparkline-box">
+            <svg viewBox="0 0 200 45" class="weight-sparkline-svg">
+              <line x1="10" y1="22" x2="190" y2="22" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="10" cy="22" r="3.5" fill="#10B981" />
+              <circle cx="55" cy="22" r="3.5" fill="#10B981" />
+              <circle cx="100" cy="22" r="3.5" fill="#10B981" />
+              <circle cx="145" cy="22" r="3.5" fill="#10B981" />
+              <circle cx="190" cy="22" r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
+            </svg>
+          </div>
+
+          <div class="weight-footer-tag">
+            <span class="tag-pill-green">
+              ↓ -1.5 kg
+            </span>
+            <span class="tag-label-muted">vs last month</span>
+          </div>
+        </section>
+
+        <!-- BMI Card -->
+        <section class="health-card">
+          <div class="bmi-header-row">
+            <div class="card-header-left">
+              <div class="card-icon-badge blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <span class="card-title">BMI</span>
+            </div>
+          </div>
+
+          <div>
+            <span class="big-stat-val" id="bmiValueText">23.5</span>
+          </div>
+          <div style="margin-top: 6px; margin-bottom: 8px;">
+            <span class="bmi-badge-normal" id="bmiStatusBadge">Normal</span>
+          </div>
+          <div class="metric-range-subtitle">Healthy Range: 18.5 – 24.9</div>
+
+          <!-- BMI Color Spectrum Gauge Bar -->
+          <div class="bmi-spectrum-wrapper">
+            <div class="bmi-pointer" id="bmiPointer"></div>
+            <div class="bmi-spectrum-bar">
+              <div class="bmi-segment blue"></div>
+              <div class="bmi-segment green"></div>
+              <div class="bmi-segment yellow"></div>
+              <div class="bmi-segment red"></div>
+            </div>
+            <div class="bmi-labels">
+              <span>18.5</span>
+              <span>24.9</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ========================================
+           BOTTOM ROW: YOGA & NUTRITION (2 CARDS)
+           ======================================== -->
+      <div class="bottom-grid">
+
+        <!-- Yoga Card -->
+        <section class="health-card yoga-card" onclick="window.location.href='yoga.html'" style="cursor: pointer;">
+          <div class="yoga-header-row">
+            <div class="card-header-left">
+              <div class="card-icon-badge green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <span class="card-title">Yoga</span>
+            </div>
+            <span class="this-week-tag">This Week</span>
+          </div>
+
+          <div class="yoga-body-content">
+            <div class="yoga-stats-col">
+              <div>
+                <div class="yoga-stat-num">2</div>
+                <div class="yoga-stat-sub">Sessions</div>
+              </div>
+              <div class="yoga-duration-box">
+                <div class="yoga-clock-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <span style="font-size: 1.15rem; font-weight:800; color:#0F172A;">1h 30m</span>
+                  <div class="yoga-stat-sub">Total Duration</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meditating Vector Illustration -->
+            <div class="yoga-illustration-col">
+              <svg viewBox="0 0 200 200" class="yoga-illustration-svg">
+                <!-- Hair -->
+                <circle cx="100" cy="54" r="16" fill="#1E293B"/>
+                <circle cx="100" cy="36" r="8" fill="#1E293B"/>
+                <!-- Face/Head -->
+                <circle cx="100" cy="62" r="13" fill="#FDBA74"/>
+                <!-- Torso (Green top) -->
+                <path d="M82,85 C82,75 118,75 118,85 L112,120 L88,120 Z" fill="#10B981"/>
+                <!-- Arms / Lotus Pose -->
+                <path d="M82,85 C70,95 60,115 65,120 C70,125 90,118 95,115" fill="none" stroke="#FDBA74" stroke-width="7" stroke-linecap="round"/>
+                <path d="M118,85 C130,95 140,115 135,120 C130,125 110,118 105,115" fill="none" stroke="#FDBA74" stroke-width="7" stroke-linecap="round"/>
+                <!-- Crossed Legs (Dark Green Pants) -->
+                <path d="M65,120 C50,130 55,145 75,145 C95,145 100,135 100,135 C100,135 105,145 125,145 C145,145 150,130 135,120 Z" fill="#065F46"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Bottom Inset Card -->
+          <div class="yoga-inset-card">
+            <div>
+              <div class="yoga-stat-sub" style="margin:0 0 2px 0;">Last Session</div>
+              <div class="yoga-inset-title">Morning Flow</div>
+              <div class="yoga-inset-sub">📅 Today, 7:30 AM</div>
+            </div>
+            <div class="chevron-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <!-- Nutrition / Diet Plan Card -->
+        <section class="health-card nutrition-card">
+          <div class="nutrition-header-row">
+            <div class="card-header-left">
+              <div class="card-icon-badge orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                  <line x1="6" y1="1" x2="6" y2="4"></line>
+                  <line x1="10" y1="1" x2="10" y2="4"></line>
+                  <line x1="14" y1="1" x2="14" y2="4"></line>
+                </svg>
+              </div>
+              <span class="card-title">Nutrition / Diet Plan</span>
+            </div>
+            <button class="btn-view-details">
+              View Details
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <div class="nutrition-main-content">
+            <!-- Left Donut Chart Gauge -->
+            <div class="donut-chart-wrapper">
+              <div class="donut-svg-container">
+                <svg viewBox="0 0 120 120" style="width:100%; height:100%; transform: rotate(-90deg);">
+                  <!-- Track Circle -->
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#F1F5F9" stroke-width="12" />
+                  <!-- Carbs Segment (Orange) -->
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#F97316" stroke-width="12" stroke-dasharray="301" stroke-dashoffset="135" stroke-linecap="round" />
+                  <!-- Protein Segment (Green) -->
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="#10B981" stroke-width="12" stroke-dasharray="301" stroke-dashoffset="225" stroke-linecap="round" />
+                </svg>
+
+                <div class="donut-center-info">
+                  <div class="flame-icon">🔥</div>
+                  <div class="kcal-value">2,250</div>
+                  <div class="kcal-unit">kcal</div>
+                </div>
+              </div>
+              <div class="target-text">Daily Target: 2,000 – 2,500 kcal</div>
+            </div>
+
+            <!-- Right Macros Breakdown -->
+            <div class="macros-list">
+              <!-- Carbohydrates -->
+              <div>
+                <div class="macro-item-header">
+                  <span class="macro-name carbs">Carbohydrates</span>
+                  <div class="macro-stats">
+                    <span class="macro-percent">55%</span>
+                    <span class="macro-grams">310g</span>
+                  </div>
+                </div>
+                <div class="macro-progress-track">
+                  <div class="macro-progress-fill carbs" style="width: 55%;"></div>
+                </div>
+              </div>
+
+              <!-- Protein -->
+              <div>
+                <div class="macro-item-header">
+                  <span class="macro-name protein">Protein</span>
+                  <div class="macro-stats">
+                    <span class="macro-percent">25%</span>
+                    <span class="macro-grams">140g</span>
+                  </div>
+                </div>
+                <div class="macro-progress-track">
+                  <div class="macro-progress-fill protein" style="width: 25%;"></div>
+                </div>
+              </div>
+
+              <!-- Fats -->
+              <div>
+                <div class="macro-item-header">
+                  <span class="macro-name fats">Fats</span>
+                  <div class="macro-stats">
+                    <span class="macro-percent">20%</span>
+                    <span class="macro-grams">50g</span>
+                  </div>
+                </div>
+                <div class="macro-progress-track">
+                  <div class="macro-progress-fill fats" style="width: 20%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Summary Pills -->
+          <div class="nutrition-bottom-pills">
+            <div class="quick-pill-card">
+              <span class="quick-pill-icon">🌱</span>
+              <div>
+                <div class="quick-pill-label">Diet Plan</div>
+                <div class="quick-pill-val">Balanced Diet</div>
+              </div>
+            </div>
+
+            <div class="quick-pill-card">
+              <span class="quick-pill-icon">🥣</span>
+              <div>
+                <div class="quick-pill-label">Meals / Day</div>
+                <div class="quick-pill-val">3 Meals + 2 Snacks</div>
+              </div>
+            </div>
+
+            <div class="quick-pill-card">
+              <span class="quick-pill-icon">💧</span>
+              <div>
+                <div class="quick-pill-label">Hydration Goal</div>
+                <div class="quick-pill-val">3.0 L / Day</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="bottom-tabs">
+      <button class="tab" id="tab-daily" onclick="window.location.href='dashboard.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span>Daily</span>
+      </button>
+      <button class="tab active" id="tab-health">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>Health</span>
+      </button>
+      <button class="tab" id="tab-athletes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>Athletes</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- JavaScript Modules -->
+  <script src="js/health.js"></script>
+</body>
+</html>

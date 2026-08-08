@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ZENFIT Yoga — Practice 10 essential yoga asanas, track your sessions, and build mindfulness.">
+  <title>ZENFIT — Yoga Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/yoga.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- ===== SIDEBAR BACKDROP ===== -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===== SIDEBAR (Sliding Drawer Panel) ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-group">
+        <div class="sidebar-logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <span class="sidebar-logo-text">ZENFIT</span>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="health.html" class="nav-item" id="nav-health">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>Health</span>
+      </a>
+      <a href="personal_details.html" class="nav-item" id="nav-personal-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21a8 8 0 0 0-16 0"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Personal Details</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-profile-lower">
+      <div class="profile-avatar" id="sidebarAvatar">AK</div>
+      <div class="profile-details">
+        <span class="profile-name" id="sidebarUserName">Akshay Kumar</span>
+        <span class="profile-badge">👑 Pro Member 👋</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Log Out</span>
+    </button>
+  </aside>
+
+  <!-- ================= HEADER ================= -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div>
+        <h1 class="greeting">
+          Yoga Dashboard <span style="font-size: 1.4rem;">🪷</span>
+        </h1>
+        <p class="greeting-sub">Find balance, calm your mind, strengthen your body</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="header-icon-btn" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+      </button>
+      <button class="header-icon-btn" aria-label="Yoga Practice Mode">
+        <i class="fa-solid fa-spa"></i>
+      </button>
+      <div class="header-avatar" id="headerAvatar">
+        <span id="headerAvatarText">AK</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content">
+
+    <!-- ===== TOP STATS GRID ===== -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon-wrapper teal">
+          <i class="fa-regular fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Session Time</h3>
+          <h1>12</h1>
+          <p>This week</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper cyan">
+          <i class="fa-solid fa-stopwatch"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Total Time</h3>
+          <h1>6h 45m</h1>
+          <p>This week</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper orange">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Streak</h3>
+          <h1>7 Days</h1>
+          <p>Keep it going</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PRACTICE SECTION HEADER ===== -->
+    <section class="practice-header">
+      <span class="practice-subtag">THE PRACTICE</span>
+      <h2 class="practice-title">Yoga & Its Asanas</h2>
+      <p class="practice-desc">
+        Yoga unites breath, body, and attention. Each asana below is a doorway — hold it softly, breathe steadily, and let the shape teach you.
+      </p>
+    </section>
+
+    <!-- ===== 10 YOGA POSES ===== -->
+    <section class="poses-list">
+
+      <!-- POSE 1: TREE POSE -->
+      <article class="pose-card">
+        <div class="pose-image-box">
+          <img src="yoga-pose.jpg" alt="Tree Pose - Vrksasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">TREE POSE</span>
+          <h3 class="pose-name">Vrksasana</h3>
+          <p class="pose-desc">
+            This pose is a standing balance posture that builds stillness and focus. Rooted through one leg, the sole of the other foot presses into the inner thigh or calf, strengthening balance and concentration, and cultivating a sense of grounded calm.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 2: WARRIOR II -->
+      <article class="pose-card reverse">
+        <div class="pose-image-box">
+          <img src="yoga-hero.jpg" alt="Warrior II - Virabhadrasana II">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">WARRIOR II</span>
+          <h3 class="pose-name">Virabhadrasana II</h3>
+          <p class="pose-desc">
+            Warrior II opens the hips and chest, building stamina and stability in the legs. With arms extended wide and gaze steady over the front hand, this pose embodies strength, confidence, and mindful presence — a powerful reminder that calm and courage can coexist.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 3: DOWNWARD-FACING DOG -->
+      <article class="pose-card">
+        <div class="pose-image-box">
+          <img src="yoga-dog.jpg" alt="Downward-Facing Dog - Adho Mukha Svanasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">DOWNWARD DOG</span>
+          <h3 class="pose-name">Adho Mukha Svanasana</h3>
+          <p class="pose-desc">
+            An essential inversion that stretches the hamstrings, shoulders, and calves while strengthening the upper body. Downward Dog energizes the whole body and brings fresh oxygenated blood to the brain.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 4: COBRA POSE -->
+      <article class="pose-card reverse">
+        <div class="pose-image-box">
+          <img src="yoga-cobra.jpg" alt="Cobra Pose - Bhujangasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">COBRA POSE</span>
+          <h3 class="pose-name">Bhujangasana</h3>
+          <p class="pose-desc">
+            Bhujangasana is a gentle backbend that opens the heart, increases spinal flexibility, and strengthens the spine and abdominal organs. It relieves fatigue and stress while lifting the mood.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 5: TRIANGLE POSE -->
+      <article class="pose-card">
+        <div class="pose-image-box">
+          <img src="yoga-triangle.jpg" alt="Triangle Pose - Trikonasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">TRIANGLE POSE</span>
+          <h3 class="pose-name">Trikonasana</h3>
+          <p class="pose-desc">
+            Trikonasana stretches the legs, knees, ankles, arms, and chest while expanding the lungs. It improves physical balance, digestion, and aids in relieving stress and backache.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 6: CHILD'S POSE -->
+      <article class="pose-card reverse">
+        <div class="pose-image-box">
+          <img src="yoga-child.jpg" alt="Child's Pose - Balasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">CHILD'S POSE</span>
+          <h3 class="pose-name">Balasana</h3>
+          <p class="pose-desc">
+            A restorative resting posture that gently stretches the hips, thighs, and ankles while calming the mind. Balasana helps relieve stress, tension in the back, and promotes deep conscious breathing.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 7: BRIDGE POSE -->
+      <article class="pose-card">
+        <div class="pose-image-box">
+          <img src="yoga-bridge.jpg" alt="Bridge Pose - Setu Bandhasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">BRIDGE POSE</span>
+          <h3 class="pose-name">Setu Bandhasana</h3>
+          <p class="pose-desc">
+            Bridge pose opens the chest, heart, and shoulders while strengthening the back, glutes, and hamstrings. It stimulates thyroid glands, improves digestion, and helps alleviate stress.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 8: LOTUS POSE -->
+      <article class="pose-card reverse">
+        <div class="pose-image-box">
+          <img src="yoga-camel.jpg" alt="Lotus Pose - Padmasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">LOTUS POSE</span>
+          <h3 class="pose-name">Padmasana</h3>
+          <p class="pose-desc">
+            The classic cross-legged meditative posture that promotes deep mental tranquility, opens the hips, and aligns the spine. Padmasana encourages stillness and prepares the mind for pranayama.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 9: EAGLE POSE -->
+      <article class="pose-card">
+        <div class="pose-image-box">
+          <img src="yoga-mountain.jpg" alt="Eagle Pose - Garudasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">EAGLE POSE</span>
+          <h3 class="pose-name">Garudasana</h3>
+          <p class="pose-desc">
+            Garudasana requires acute concentration and steady balance. Wrapping the arms and legs stretches the shoulders, upper back, and thighs while sharpening mental focus.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- POSE 10: CORPSE POSE -->
+      <article class="pose-card reverse">
+        <div class="pose-image-box">
+          <img src="yoga-savasana.jpg" alt="Corpse Pose - Savasana">
+        </div>
+        <div class="pose-content">
+          <span class="pose-tag">CORPSE POSE</span>
+          <h3 class="pose-name">Savasana</h3>
+          <p class="pose-desc">
+            The final resting pose of every yoga session. Savasana allows the body to integrate the benefits of practice, releases nervous system tension, and restores total harmony to body and mind.
+          </p>
+          <div class="pose-actions">
+            <button class="btn-start-practice">
+              <i class="fa-solid fa-play"></i> Start Practice
+            </button>
+            <button class="btn-bookmark" aria-label="Bookmark pose">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- ===== BOTTOM TABS NAV ===== -->
+  <div class="bottom-tabs">
+    <a class="tab" href="dashboard.html">
+      <i class="fa-solid fa-house"></i> Daily
+    </a>
+    <a class="tab" href="health.html">
+      <i class="fa-solid fa-heart"></i> Health
+    </a>
+    <a class="tab active" href="yoga.html">
+      <i class="fa-solid fa-spa"></i> Yoga
+    </a>
+    <a class="tab" href="athletes.html">
+      <i class="fa-solid fa-users"></i> Athletes
+    </a>
+  </div>
+
+  <!-- ===== PRACTICE TIMER MODAL ===== -->
+  <div class="modal" id="practiceModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close modal">&times;</button>
+      <h2 id="modalPoseTitle" style="font-size: 1.5rem; font-weight:800; margin-bottom:6px;">Vrksasana</h2>
+      <p style="font-size:0.85rem; color:var(--text-medium);">Hold the pose & breathe deeply</p>
+
+      <div class="timer-circle" id="timerCircle">
+        <div class="timer-display" id="timerDisplay">1:00</div>
+        <div class="timer-subtext">Remaining</div>
+      </div>
+
+      <button class="btn-start-practice" id="toggleTimerBtn" style="margin: 10px auto 0;">
+        Start Timer
+      </button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/yoga.js"></script>
+</body>
+</html>

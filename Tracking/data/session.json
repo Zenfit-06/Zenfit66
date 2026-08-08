@@ -1,0 +1,11 @@
+{
+    "currentUser": {
+        "id": 6,
+        "fullName": "Arushi",
+        "email": "arushi@gmail.com",
+        "password": "arushi@gmail.com",
+        "createdTime": "2026-08-07T06:36:18.592Z",
+        "lastLogin": "2026-08-07T06:36:26.824Z"
+    },
+    "loggedInAt": "2026-08-07T06:36:26.833Z"
+}
