@@ -1,464 +1,2279 @@
-/**
- * ZENFIT Fitness Dashboard — Main Script
- * Handles auth, greeting, animations, heatmap, sparkline, map, navigation.
- */
+document.addEventListener("DOMContentLoaded", function () {
 
-const API_BASE = (window.location.protocol === 'http:' || window.location.protocol === 'https:') && window.location.port === '3000' ? '' : 'http://localhost:3000';
+    "use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Authentication Check via localStorage
-    let currentUser = null;
-    try {
-        currentUser = JSON.parse(localStorage.getItem('zenfit_user') || 'null');
-    } catch (e) {
-        currentUser = null;
+
+    /* =====================================================
+       HELPER
+    ===================================================== */
+
+    function $(id) {
+        return document.getElementById(id);
     }
 
-    if (!currentUser) {
-        window.location.href = 'login.html';
-        return;
-    }
 
-    initDashboard(currentUser);
-    showProfileModal(currentUser);
-});
+    /* =====================================================
+       PROFILE STORAGE
+    ===================================================== */
 
-// ========================================
-//  INIT
-// ========================================
+  const DEFAULT_PROFILE = {
+    name: "User",
+    email: "user@zenfit.com",
+    phone: "",
+    password: "",
+    gender: "Male",
+    age: "25",
+    height: "175",
+    weight: "70",
+    bodyFat: "15%",
+    goal: "Maintain Fitness"
+};
 
-function initDashboard(user) {
-    setupUserInfo(user);
-    requestAnimationFrame(() => {
-        animateProgressBars();
-        animateCircularRing();
-        generateSparkline();
-        generateHeatmap();
-        generateActivityMap();
-        setupSidebarToggle();
-        setupNavigation();
-        setupBottomTabs();
-        setupLogout();
-        triggerEntranceAnimations();
-    });
-}
+    function loadProfile() {
+        try {
+            let activeUser = null;
+            try {
+                activeUser = JSON.parse(localStorage.getItem("zenfit_user") || "null");
+            } catch (e) {}
 
-// ========================================
-//  USER INFO & GREETING
-// ========================================
+            const saved = localStorage.getItem("zenfitProfile");
+            let savedObj = saved ? JSON.parse(saved) : {};
 
-function setupUserInfo(user) {
-    const hour = new Date().getHours();
-    let greetingText = 'Good Evening';
-    if (hour < 12) greetingText = 'Good Morning';
-    else if (hour < 18) greetingText = 'Good Afternoon';
+            let merged = {
+                ...DEFAULT_PROFILE,
+                ...savedObj
+            };
 
-    const fullName = user.fullName || user.name || 'User';
-    const firstName = fullName.split(' ')[0];
-
-    const greetingEl = document.getElementById('greeting');
-    if (greetingEl) {
-        greetingEl.textContent = `${greetingText}, ${firstName}! 👋`;
-    }
-
-    const avatarInitials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-
-    const sidebarAvatarEl = document.getElementById('userAvatar');
-    if (sidebarAvatarEl) {
-        sidebarAvatarEl.textContent = avatarInitials;
-    }
-
-    const headerAvatarEl = document.getElementById('headerAvatarText');
-    if (headerAvatarEl) {
-        headerAvatarEl.textContent = avatarInitials;
-    }
-
-    const sidebarNameEl = document.getElementById('userName');
-    if (sidebarNameEl) {
-        sidebarNameEl.textContent = fullName;
-    }
-}
-
-// ========================================
-//  PROGRESS BARS
-// ========================================
-
-function animateProgressBars() {
-    const bars = document.querySelectorAll('.progress-bar, .weekly-bar');
-    bars.forEach(bar => {
-        const target = bar.style.getPropertyValue('--progress');
-        if (target) {
-            bar.style.width = '0%';
-            void bar.offsetWidth; // Force reflow
-            requestAnimationFrame(() => {
-                bar.style.width = target;
-            });
-        }
-    });
-}
-
-// ========================================
-//  CIRCULAR PROGRESS RING
-// ========================================
-
-function animateCircularRing() {
-    const ring = document.querySelector('.ring-progress');
-    if (!ring) return;
-
-    const radius = parseFloat(ring.getAttribute('r')) || 34;
-    const circumference = 2 * Math.PI * radius;
-    const percent = 0.92; // 92%
-    const targetOffset = circumference * (1 - percent);
-
-    ring.style.strokeDasharray = `${circumference}`;
-    ring.style.strokeDashoffset = `${circumference}`;
-
-    void ring.getBoundingClientRect(); // Force reflow
-
-    requestAnimationFrame(() => {
-        ring.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        ring.style.strokeDashoffset = `${targetOffset}`;
-    });
-}
-
-// ========================================
-//  SPARKLINE
-// ========================================
-
-function generateSparkline() {
-    const container = document.getElementById('sparkline');
-    if (!container) return;
-
-    const data = [60, 65, 58, 72, 68, 75, 80, 78, 85, 88, 92];
-    const width = 120;
-    const height = 32;
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-
-    const points = data.map((val, i) => {
-        const x = (i / (data.length - 1)) * width;
-        const y = height - ((val - min) / range) * (height * 0.75) - (height * 0.1);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-
-    container.innerHTML = `
-        <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow:visible;">
-            <defs>
-                <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
-                </linearGradient>
-            </defs>
-            <polygon points="0,${height} ${points} ${width},${height}" fill="url(#sparkFill)"/>
-            <polyline points="${points}" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    `;
-}
-
-// ========================================
-//  ACTIVITY HEATMAP
-// ========================================
-
-function generateHeatmap() {
-    const container = document.getElementById('heatmap');
-    if (!container) return;
-
-    const colors = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const cols = 31;
-    const headerPositions = [1, 5, 10, 15, 20, 25, 31];
-
-    let html = '<div style="display:flex;flex-direction:column;gap:2.5px;width:100%;">';
-
-    // Column numbers header
-    html += '<div style="display:flex;gap:2.5px;margin-bottom:2px;">';
-    html += '<div style="width:26px;"></div>';
-    for (let i = 1; i <= cols; i++) {
-        const label = headerPositions.includes(i) ? i : '';
-        html += `<div style="width:9px;text-align:center;font-size:7.5px;color:#94a3b8;font-weight:500;">${label}</div>`;
-    }
-    html += '</div>';
-
-    // Heatmap Rows (Mon to Sun)
-    for (let r = 0; r < 7; r++) {
-        html += '<div style="display:flex;gap:2.5px;align-items:center;">';
-        html += `<div style="width:26px;font-size:8px;color:#64748b;text-align:right;padding-right:3px;font-weight:500;">${days[r]}</div>`;
-
-        for (let c = 1; c <= cols; c++) {
-            const level = Math.floor(Math.random() * 5);
-            const color = colors[level];
-            const delay = (r * cols + c) * 2;
-            html += `<div style="width:9px;height:9px;border-radius:2px;background:${color};opacity:0;animation:heatmapFadeIn 0.3s ease forwards ${delay}ms;" title="Day ${c}: ${level} workouts"></div>`;
-        }
-        html += '</div>';
-    }
-    html += '</div>';
-
-    if (!document.getElementById('heatmap-anim')) {
-        const style = document.createElement('style');
-        style.id = 'heatmap-anim';
-        style.textContent = `
-            @keyframes heatmapFadeIn {
-                from { opacity: 0; transform: scale(0.6); }
-                to { opacity: 1; transform: scale(1); }
+            if (activeUser) {
+                merged.name = activeUser.fullName || activeUser.name || merged.name;
+                merged.email = activeUser.email || merged.email;
+                if (activeUser.gender) merged.gender = activeUser.gender;
+                if (activeUser.age) merged.age = activeUser.age;
+                if (activeUser.height) merged.height = activeUser.height;
+                if (activeUser.weight) merged.weight = activeUser.weight;
+                if (activeUser.fitnessGoal || activeUser.goal) merged.goal = activeUser.fitnessGoal || activeUser.goal;
+                if (activeUser.password) merged.password = activeUser.password;
+                if (activeUser.bmi) merged.bmi = activeUser.bmi;
             }
-        `;
-        document.head.appendChild(style);
+
+            if (!activeUser) {
+                activeUser = {
+                    fullName: merged.name,
+                    name: merged.name,
+                    email: merged.email,
+                    gender: merged.gender,
+                    age: merged.age,
+                    height: merged.height,
+                    weight: merged.weight,
+                    goal: merged.goal,
+                    fitnessGoal: merged.goal
+                };
+                localStorage.setItem("zenfit_user", JSON.stringify(activeUser));
+            }
+
+            localStorage.setItem("zenfitProfile", JSON.stringify(merged));
+            return merged;
+        } catch (error) {
+            console.error("ZENFIT profile load error:", error);
+            return { ...DEFAULT_PROFILE };
+        }
     }
 
-    container.innerHTML = html;
+    let profile = loadProfile();
+
+    function saveProfile() {
+        localStorage.setItem("zenfitProfile", JSON.stringify(profile));
+
+        let currentUser = null;
+        try {
+            currentUser = JSON.parse(localStorage.getItem("zenfit_user") || "{}");
+        } catch(e) { currentUser = {}; }
+
+        currentUser.fullName = profile.name;
+        currentUser.name = profile.name;
+        currentUser.email = profile.email;
+        currentUser.gender = profile.gender;
+        currentUser.age = profile.age;
+        currentUser.height = profile.height;
+        currentUser.weight = profile.weight;
+        currentUser.goal = profile.goal;
+        currentUser.fitnessGoal = profile.goal;
+        if (profile.password) currentUser.password = profile.password;
+
+        localStorage.setItem("zenfit_user", JSON.stringify(currentUser));
+
+        try {
+            let users = JSON.parse(localStorage.getItem("zenfit_users") || "[]");
+            let idx = users.findIndex(u => u.email && currentUser.email && u.email.toLowerCase() === currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                users[idx] = { ...users[idx], ...currentUser };
+            } else if (currentUser.email) {
+                users.push(currentUser);
+            }
+            localStorage.setItem("zenfit_users", JSON.stringify(users));
+        } catch(e) {}
+    }
+
+
+
+    /* =====================================================
+       INITIALIZE NUMERIC STORAGE
+    ===================================================== */
+
+    function getNumber(key) {
+
+        const value =
+            Number(
+                localStorage.getItem(key)
+            );
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+    }
+
+
+    function setNumber(key, value) {
+
+        localStorage.setItem(
+            key,
+            String(value)
+        );
+    }
+
+
+
+    /* =====================================================
+       GREETING
+    ===================================================== */
+
+    function updateGreeting() {
+
+        const greeting = $("greeting");
+
+        if (!greeting) return;
+
+
+        const hour =
+            new Date().getHours();
+
+
+        let greetingText =
+            "Good Morning";
+
+
+        if (hour >= 12 && hour < 17) {
+
+            greetingText =
+                "Good Afternoon";
+
+        } else if (hour >= 17) {
+
+            greetingText =
+                "Good Evening";
+        }
+
+
+        const name =
+            profile.name &&
+            profile.name.trim()
+                ? profile.name.trim()
+                : "User";
+
+
+        greeting.textContent =
+            `${greetingText}, ${name}! 👋`;
+    }
+
+
+
+    /* =====================================================
+       INITIALS
+    ===================================================== */
+
+    function getInitials(name) {
+
+        if (!name || !name.trim()) {
+            return "U";
+        }
+
+
+        const parts =
+            name
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+
+        if (parts.length === 1) {
+
+            return parts[0]
+                .charAt(0)
+                .toUpperCase();
+        }
+
+
+        return (
+            parts[0].charAt(0) +
+            parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+    }
+
+
+
+    /* =====================================================
+       PROFILE UI
+    ===================================================== */
+
+    function updateProfileUI() {
+        let displayName = profile.name || "User";
+        if (displayName.includes("@")) {
+            const parts = displayName.split("@");
+            if (parts[0]) displayName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+        }
+
+        const initials = getInitials(displayName);
+
+        const headerAvatarText = $("headerAvatarText");
+        const modalAvatar = $("modalAvatar");
+        const sidebarAvatar = $("sidebarAvatar");
+        const sidebarUserName = $("sidebarUserName");
+        const sidebarUserBadge = $("sidebarUserBadge") || $("sidebarUserEmail");
+
+        if (headerAvatarText) headerAvatarText.textContent = initials;
+        if (modalAvatar) modalAvatar.textContent = initials;
+        if (sidebarAvatar) sidebarAvatar.textContent = initials;
+        if (sidebarUserName) sidebarUserName.textContent = displayName;
+        if (sidebarUserBadge) {
+            sidebarUserBadge.textContent = "👑 Pro Member 👋";
+            sidebarUserBadge.style.color = "#FF7043";
+            sidebarUserBadge.style.fontWeight = "600";
+        }
+
+        updateGreeting();
+    }
+
+
+
+    /* =====================================================
+       SIDEBAR
+    ===================================================== */
+
+    const sidebar =
+        $("sidebar");
+
+    const sidebarOverlay =
+        $("sidebarOverlay");
+
+    const hamburgerBtn =
+        $("hamburgerBtn");
+
+    const sidebarClose =
+        $("sidebarClose");
+
+
+ function openSidebar(){
+
+    if(sidebar){
+        sidebar.classList.add("open");
+    }
+
+    if(sidebarOverlay){
+        sidebarOverlay.classList.add("open");
+    }
+
+    document.body.classList.add("sidebar-open");
 }
 
-// ========================================
-//  ACTIVITY MAP (SVG Route)
-// ========================================
 
-function generateActivityMap() {
-    const container = document.getElementById('activityMap');
-    if (!container) return;
+function closeSidebar(){
 
-    container.innerHTML = `
-        <svg width="100%" height="100%" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice" style="display:block;">
-            <!-- Light map background roads -->
-            <line x1="0" y1="30" x2="400" y2="30" stroke="#e2e8f0" stroke-width="2"/>
-            <line x1="0" y1="75" x2="400" y2="75" stroke="#e2e8f0" stroke-width="2"/>
-            <line x1="0" y1="120" x2="400" y2="120" stroke="#e2e8f0" stroke-width="2"/>
-            <line x1="80" y1="0" x2="80" y2="150" stroke="#e2e8f0" stroke-width="2"/>
-            <line x1="200" y1="0" x2="200" y2="150" stroke="#e2e8f0" stroke-width="2"/>
-            <line x1="320" y1="0" x2="320" y2="150" stroke="#e2e8f0" stroke-width="2"/>
+    if(sidebar){
+        sidebar.classList.remove("open");
+    }
 
-            <!-- Route line -->
-            <polyline points="30,120 70,100 110,110 160,65 210,75 260,40 310,55 370,35"
-                      fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
-                      style="filter:drop-shadow(0 2px 4px rgba(14,165,233,0.3));"
-                      stroke-dasharray="600" stroke-dashoffset="600">
-                <animate attributeName="stroke-dashoffset" from="600" to="0" dur="1.5s" fill="freeze" begin="0.3s"/>
-            </polyline>
+    if(sidebarOverlay){
+        sidebarOverlay.classList.remove("open");
+    }
 
-            <!-- Start marker -->
-            <circle cx="30" cy="120" r="6" fill="#22c55e" stroke="#fff" stroke-width="2" opacity="0">
-                <animate attributeName="opacity" from="0" to="1" dur="0.3s" fill="freeze" begin="0.4s"/>
-            </circle>
-
-            <!-- End marker -->
-            <circle cx="370" cy="35" r="6" fill="#ef4444" stroke="#fff" stroke-width="2" opacity="0">
-                <animate attributeName="opacity" from="0" to="1" dur="0.3s" fill="freeze" begin="1.8s"/>
-            </circle>
-        </svg>
-    `;
+    document.body.classList.remove("sidebar-open");
 }
 
-// ========================================
-//  SIDEBAR TOGGLE (Mobile)
-// ========================================
 
-function openSidebar() {
-    document.body.classList.add('sidebar-open');
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+
+const menuLogout =
+    $("menuLogout");
+
+
+if(menuLogout){
+
+    menuLogout.addEventListener(
+        "click",
+        function(e){
+
+            e.preventDefault();
+
+
+            const confirmLogout =
+                confirm(
+                    "Are you sure you want to logout?"
+                );
+
+
+            if(!confirmLogout){
+                return;
+            }
+
+document
+.getElementById("menuLogout")
+.onclick=function(){
+
+localStorage.removeItem("zenfit_user");
+
+window.location.href="login.html";
+
+};
+
+        }
+    );
+
 }
+
 
 function closeSidebar() {
-    document.body.classList.remove('sidebar-open');
-}
 
-function setupSidebarToggle() {
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const closeBtn = document.getElementById('sidebarCloseBtn');
-    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) {
+        sidebar.classList.remove("open");
+    }
+
+
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove("open");
+    }
+
+
+    if (
+        !$("profileModalOverlay") ||
+        !$("profileModalOverlay").classList.contains("show")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
 
     if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (document.body.classList.contains('sidebar-open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
+
+        hamburgerBtn.addEventListener(
+            "click",
+            openSidebar
+        );
+    }
+
+
+    if (sidebarClose) {
+
+        sidebarClose.addEventListener(
+            "click",
+            closeSidebar
+        );
+    }
+
+
+    if (sidebarOverlay) {
+
+        sidebarOverlay.addEventListener(
+            "click",
+            closeSidebar
+        );
+    }
+
+
+
+    /* =====================================================
+       PROFILE MODAL
+    ===================================================== */
+
+    const profileModalOverlay =
+        $("profileModalOverlay");
+
+
+    function clearErrors() {
+
+        const errorIds = [
+            "nameError",
+            "emailError",
+            "phoneError",
+            "passwordError",
+            "confirmPasswordError"
+        ];
+
+
+        errorIds.forEach(function (id) {
+
+            const element = $(id);
+
+            if (element) {
+                element.textContent = "";
             }
+
         });
+
+
+        document
+            .querySelectorAll(".form-input.error")
+            .forEach(function (input) {
+
+                input.classList.remove(
+                    "error"
+                );
+            });
     }
 
-    if (closeBtn) {
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeSidebar();
-        });
-    }
 
-    if (backdrop) {
-        backdrop.addEventListener('click', () => {
-            closeSidebar();
-        });
-    }
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeSidebar();
+    function openProfileModal() {
+
+        if (!profileModalOverlay) {
+            return;
         }
-    });
-}
 
-// ========================================
-//  SIDEBAR NAVIGATION
-// ========================================
 
-function setupNavigation() {
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+        closeSidebar();
 
-    navItems.forEach(item => {
 
-        item.addEventListener('click', () => {
+        $("editFullName").value =
+            profile.name || "";
 
-            navItems.forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
 
-            closeSidebar();
+        $("editEmail").value =
+            profile.email || "";
 
+
+        $("editPhone").value =
+            profile.phone || "";
+
+
+        $("editPassword").value =
+            "";
+
+
+        $("editConfirmPassword").value =
+            "";
+
+        $("editAge").value =
+profile.age || "";
+
+
+$("editGender").value =
+profile.gender || "";
+
+
+$("editHeight").value =
+profile.height || "";
+
+
+$("editWeight").value =
+profile.weight || "";
+
+
+$("editGoal").value =
+profile.goal || "";
+
+
+        clearErrors();
+
+
+        const saveMessage =
+            $("saveMessage");
+
+
+        if (saveMessage) {
+
+            saveMessage.classList.remove(
+                "show"
+            );
+        }
+
+
+        profileModalOverlay.classList.add(
+            "show"
+        );
+
+
+        document.body.style.overflow =
+            "hidden";
+
+
+        setTimeout(function () {
+
+            const nameInput =
+                $("editFullName");
+
+            if (nameInput) {
+                nameInput.focus();
+            }
+
+        }, 100);
+    }
+
+
+
+    function closeProfileModal() {
+
+        if (!profileModalOverlay) {
+            return;
+        }
+
+
+        profileModalOverlay.classList.remove(
+            "show"
+        );
+
+
+        document.body.style.overflow =
+            "";
+    }
+
+
+
+    const headerAvatar =
+        $("headerAvatar");
+
+
+    if (headerAvatar) {
+
+        headerAvatar.style.cursor = "pointer";
+
+        headerAvatar.addEventListener(
+            "click",
+            function () {
+                window.location.href = "personal_details.html";
+            }
+        );
+
+
+        headerAvatar.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                ) {
+
+                    event.preventDefault();
+
+                    window.location.href = "personal_details.html";
+                }
+            }
+        );
+    }
+
+
+
+    const closeProfileModalBtn =
+        $("closeProfileModal");
+
+
+    if (closeProfileModalBtn) {
+
+        closeProfileModalBtn.addEventListener(
+            "click",
+            closeProfileModal
+        );
+    }
+
+
+
+    const cancelProfile =
+        $("cancelProfile");
+
+
+    if (cancelProfile) {
+
+        cancelProfile.addEventListener(
+            "click",
+            closeProfileModal
+        );
+    }
+
+
+
+    if (profileModalOverlay) {
+
+        profileModalOverlay.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    profileModalOverlay
+                ) {
+
+                    closeProfileModal();
+                }
+            }
+        );
+    }
+
+
+
+    /* =====================================================
+       FORM ERROR
+    ===================================================== */
+
+    function clearErrors() {
+        const errorIds = ["nameError", "emailError", "phoneError", "passwordError", "confirmPasswordError", "ageError", "heightError", "weightError"];
+        const inputIds = ["editFullName", "editEmail", "editPhone", "editPassword", "editConfirmPassword", "editAge", "editHeight", "editWeight"];
+
+        errorIds.forEach(id => {
+            const el = $(id);
+            if (el) el.textContent = "";
         });
 
-    });
-}
-// ========================================
-//  BOTTOM TAB BAR
-// ========================================
-
-function setupBottomTabs() {
-    const tabs = document.querySelectorAll('.bottom-tabs .tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            if (tab.id === 'tab-health') {
-                window.location.href = 'health.html';
-            } else if (tab.id === 'tab-athletes') {
-                window.location.href = 'athletes.html';
-            } else if (tab.id === 'tab-yoga') {
-                window.location.href = 'yoga.html';
-            }
-        });
-    });
-}
-
-// ========================================
-//  LOGOUT
-// ========================================
-
-function setupLogout() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('Log out of ZENFIT?')) {
-                localStorage.removeItem('zenfit_user');
-                window.location.href = 'login.html';
-            }
+        inputIds.forEach(id => {
+            const el = $(id);
+            if (el) el.classList.remove("error");
         });
     }
-}
+
+    function showError(
+        inputId,
+        errorId,
+        message
+    ) {
+
+        const input =
+            $(inputId);
+
+        const error =
+            $(errorId);
 
 
-function triggerEntranceAnimations() {
-    const cards = document.querySelectorAll('.stat-card');
-    cards.forEach((card, i) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(15px)';
-        card.style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s`;
+        if (input) {
 
-        requestAnimationFrame(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        });
-    });
-}
+            input.classList.add(
+                "error"
+            );
+        }
 
 
-function showProfileModal(user) {
-    const modal = document.getElementById("profileModal");
-    if (!modal) return;
+        if (error) {
 
-    // Only show if age, gender, height, or weight are missing
-    if (!user || !user.age || !user.gender || !user.height || !user.weight) {
-        modal.style.display = "flex";
-    } else {
-        modal.style.display = "none";
+            error.textContent =
+                message;
+        }
     }
-}
 
-const saveProfileBtn = document.getElementById("saveProfile");
-if (saveProfileBtn) {
-    saveProfileBtn.addEventListener("click", () => {
 
-        const age = document.getElementById("age");
-        const gender = document.getElementById("gender");
-        const height = document.getElementById("height");
-        const weight = document.getElementById("weight");
 
-        // Reset
-        document.querySelectorAll(".error").forEach(e => e.textContent = "");
-        document.querySelectorAll("input,select").forEach(e => e.classList.remove("input-error"));
+    /* =====================================================
+       PROFILE VALIDATION
+    ===================================================== */
+
+    function validateProfile() {
+
+        clearErrors();
+
 
         let valid = true;
 
-        const ageVal = parseFloat(age.value);
-        const heightVal = parseFloat(height.value);
-        const weightVal = parseFloat(weight.value);
 
-        if (isNaN(ageVal) || ageVal <= 0 || ageVal > 120) {
-            document.getElementById("ageError").textContent = "Please enter a valid age (1 - 120)";
-            age.classList.add("input-error");
+        const name =
+            $("editFullName")
+                .value
+                .trim();
+
+
+        const email =
+            $("editEmail")
+                .value
+                .trim();
+
+
+        const phone =
+            $("editPhone")
+                .value
+                .trim();
+
+
+        const password =
+            $("editPassword")
+                .value;
+
+
+        const confirmPassword =
+            $("editConfirmPassword")
+                .value;
+
+
+
+        /* NAME */
+
+        if (name.length < 2) {
+
+            showError(
+                "editFullName",
+                "nameError",
+                "Please enter your full name."
+            );
+
             valid = false;
         }
 
-        if (gender.value === "") {
-            document.getElementById("genderError").textContent = "Please select gender";
-            gender.classList.add("input-error");
+
+
+        /* EMAIL */
+
+        if (!email) {
+
+            showError(
+                "editEmail",
+                "emailError",
+                "Please enter your email."
+            );
+
             valid = false;
-        }
 
-        if (isNaN(heightVal) || heightVal < 50 || heightVal > 300) {
-            document.getElementById("heightError").textContent = "Please enter a valid height in cm (50 - 300)";
-            height.classList.add("input-error");
-            valid = false;
-        }
+        } else {
 
-        if (isNaN(weightVal) || weightVal < 10 || weightVal > 500) {
-            document.getElementById("weightError").textContent = "Please enter a valid weight in kg (10 - 500)";
-            weight.classList.add("input-error");
-            valid = false;
-        }
+            const emailRegex =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!valid) return;
 
-        const heightInMeter = heightVal / 100;
-        const bmiVal = (weightVal / (heightInMeter * heightInMeter)).toFixed(1);
+            if (!emailRegex.test(email)) {
 
-        const updates = {
-            age: age.value,
-            gender: gender.value,
-            height: height.value,
-            weight: weight.value,
-            bmi: bmiVal
-        };
+                showError(
+                    "editEmail",
+                    "emailError",
+                    "Please enter a valid email."
+                );
 
-        const currentUser = JSON.parse(localStorage.getItem('zenfit_user') || '{}');
-        const updatedUser = { ...currentUser, ...updates };
-        localStorage.setItem('zenfit_user', JSON.stringify(updatedUser));
-        setupUserInfo(updatedUser);
-
-        // Also update usersDB list in localStorage
-        try {
-            const users = JSON.parse(localStorage.getItem('zenfit_users') || '[]');
-            const idx = users.findIndex(u => u.id === updatedUser.id || (u.email && u.email.toLowerCase() === updatedUser.email?.toLowerCase()));
-            if (idx !== -1) {
-                users[idx] = { ...users[idx], ...updates };
-                localStorage.setItem('zenfit_users', JSON.stringify(users));
+                valid = false;
             }
-        } catch (e) {}
+        }
 
-        document.getElementById("profileModal").style.display = "none";
-    });
+
+
+        /* PHONE */
+
+        if (phone) {
+
+            const digits =
+                phone.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            if (digits.length < 10) {
+
+                showError(
+                    "editPhone",
+                    "phoneError",
+                    "Please enter a valid phone number."
+                );
+
+                valid = false;
+            }
+        }
+
+
+
+        /* PASSWORD */
+
+        if (password) {
+
+            if (password.length < 6) {
+
+                showError(
+                    "editPassword",
+                    "passwordError",
+                    "Password must be at least 6 characters."
+                );
+
+                valid = false;
+            }
+
+
+            if (
+                password !==
+                confirmPassword
+            ) {
+
+                showError(
+                    "editConfirmPassword",
+                    "confirmPasswordError",
+                    "Passwords do not match."
+                );
+
+                valid = false;
+            }
+        }
+
+
+        /* AGE */
+        const ageInput = $("editAge");
+        if (ageInput && ageInput.value) {
+            const ageNum = parseFloat(ageInput.value);
+            if (isNaN(ageNum) || ageNum <= 0 || ageNum > 120) {
+                showError("editAge", "ageError", "Age must be a valid positive number (1-120).");
+                valid = false;
+            }
+        }
+
+        /* HEIGHT */
+        const heightInput = $("editHeight");
+        if (heightInput && heightInput.value) {
+            const heightNum = parseFloat(heightInput.value);
+            if (isNaN(heightNum) || heightNum <= 0 || heightNum > 300) {
+                showError("editHeight", "heightError", "Height must be a valid positive number (cm).");
+                valid = false;
+            }
+        }
+
+        /* WEIGHT */
+        const weightInput = $("editWeight");
+        if (weightInput && weightInput.value) {
+            const weightNum = parseFloat(weightInput.value);
+            if (isNaN(weightNum) || weightNum <= 0 || weightNum > 500) {
+                showError("editWeight", "weightError", "Weight must be a valid positive number (kg).");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+
+
+    /* =====================================================
+       SAVE PROFILE
+    ===================================================== */
+
+    const saveProfileChanges =
+        $("saveProfileChanges");
+
+
+    if (saveProfileChanges) {
+
+        saveProfileChanges.addEventListener(
+            "click",
+            function () {
+
+                if (!validateProfile()) {
+                    return;
+                }
+
+
+                profile.name =
+                    $("editFullName")
+                        .value
+                        .trim();
+
+
+                profile.email =
+                    $("editEmail")
+                        .value
+                        .trim();
+
+
+                profile.phone =
+                    $("editPhone")
+                        .value
+                        .trim();
+
+
+                profile.age =
+$("editAge").value;
+
+
+profile.gender =
+$("editGender").value;
+
+
+profile.height =
+$("editHeight").value;
+
+
+profile.weight =
+$("editWeight").value;
+
+
+profile.goal =
+$("editGoal").value;
+
+
+
+                const newPassword =
+                    $("editPassword").value;
+
+
+                if (newPassword) {
+
+                    profile.password =
+                        newPassword;
+                }
+
+
+                saveProfile();
+
+
+                updateProfileUI();
+
+
+                calculateBodyStats();
+
+
+                updateDashboard();
+
+
+                const saveMessage =
+                    $("saveMessage");
+
+
+                if (saveMessage) {
+
+                    saveMessage.classList.add(
+                        "show"
+                    );
+                }
+
+
+                setTimeout(
+                    closeProfileModal,
+                    1000
+                );
+
+            }
+        );
+    }
+
+
+
+    /* =====================================================
+       BODY STATS
+    ===================================================== */
+
+    function calculateBodyStats() {
+
+        const height =
+            parseFloat(profile.height);
+
+
+        const weight =
+            parseFloat(profile.weight);
+
+
+        const age =
+            parseFloat(profile.age);
+
+
+        const bmiElement =
+            $("bmiValue");
+
+
+        const heightElement =
+            $("heightValue");
+
+
+        const weightElement =
+            $("weightValue");
+
+
+        const bmrElement =
+            $("bmrValue");
+
+
+        if (heightElement) {
+
+            heightElement.textContent =
+                height > 0
+                    ? `${height} cm`
+                    : "--";
+        }
+
+
+        if (weightElement) {
+
+            weightElement.textContent =
+                weight > 0
+                    ? `${weight} kg`
+                    : "--";
+        }
+
+
+        if (
+            height > 0 &&
+            weight > 0
+        ) {
+
+            const heightMeters =
+                height / 100;
+
+
+            const bmi =
+                weight /
+                (heightMeters * heightMeters);
+
+
+            if (bmiElement) {
+
+                bmiElement.textContent =
+                    bmi.toFixed(1);
+            }
+
+
+        } else {
+
+            if (bmiElement) {
+                bmiElement.textContent =
+                    "--";
+            }
+        }
+
+
+        const goalElement =
+$("goalValue");
+
+
+if(goalElement){
+
+goalElement.textContent =
+profile.goal || "--";
+
 }
 
 
 
 
+        /* BMR */
 
+        if (
+            height > 0 &&
+            weight > 0 &&
+            age > 0
+        ) {
+
+            let bmr;
+
+
+            if (
+                String(profile.gender)
+                    .toLowerCase()
+                    .startsWith("m")
+            ) {
+
+                bmr =
+                    10 * weight +
+                    6.25 * height -
+                    5 * age +
+                    5;
+
+            } else {
+
+                bmr =
+                    10 * weight +
+                    6.25 * height -
+                    5 * age -
+                    161;
+            }
+
+
+            if (bmrElement) {
+
+                bmrElement.textContent =
+                    `${Math.round(bmr)} kcal`;
+            }
+
+
+            const calorieValue =
+                $("calorieNeedValue");
+
+
+            const calorieBar =
+                $("calorieNeedProgressBar");
+
+
+            const calorieLabel =
+                $("calorieNeedProgressLabel");
+
+
+            if (calorieValue) {
+
+                calorieValue.textContent =
+                    Math.round(bmr);
+            }
+
+
+            if (calorieBar) {
+
+                calorieBar.style.setProperty(
+                    "--progress",
+                    "100%"
+                );
+            }
+
+
+            if (calorieLabel) {
+
+                calorieLabel.textContent =
+                    "Estimated daily need";
+            }
+
+
+        } else {
+
+            if (bmrElement) {
+                bmrElement.textContent =
+                    "--";
+            }
+
+
+            const calorieValue =
+                $("calorieNeedValue");
+
+
+            const calorieBar =
+                $("calorieNeedProgressBar");
+
+
+            const calorieLabel =
+                $("calorieNeedProgressLabel");
+
+
+            if (calorieValue) {
+                calorieValue.textContent =
+                    "0";
+            }
+
+
+            if (calorieBar) {
+
+                calorieBar.style.setProperty(
+                    "--progress",
+                    "0%"
+                );
+            }
+
+
+            if (calorieLabel) {
+
+                calorieLabel.textContent =
+                    "Complete profile to calculate";
+            }
+        }
+    }
+
+
+
+    /* =====================================================
+       FITNESS SCORE
+    ===================================================== */
+
+    function updateFitnessScore() {
+
+        const sessions =
+            getNumber(
+                "zenfitWorkoutSessions"
+            );
+
+
+        const distance =
+            getNumber(
+                "zenfitDistance"
+            );
+
+
+        let score = 0;
+
+
+        score += Math.min(
+            sessions * 10,
+            40
+        );
+
+
+        score += Math.min(
+            distance * 5,
+            30
+        );
+
+
+        if (
+            profile.name &&
+            profile.name !== "User"
+        ) {
+
+            score += 15;
+        }
+
+
+        if (
+            profile.height &&
+            profile.weight
+        ) {
+
+            score += 15;
+        }
+
+
+        score =
+            Math.min(
+                Math.round(score),
+                100
+            );
+
+
+        const scoreElement =
+            $("fitnessScore");
+
+
+        const scoreRing =
+            $("scoreRing");
+
+
+        const scoreLabel =
+            $("scoreLabel");
+
+
+        if (scoreElement) {
+
+            scoreElement.textContent =
+                score;
+        }
+
+
+        if (scoreRing) {
+
+            scoreRing.style.setProperty(
+                "--score-degree",
+                `${score * 3.6}deg`
+            );
+        }
+
+
+        if (scoreLabel) {
+
+            if (score === 0) {
+
+                scoreLabel.textContent =
+                    "No Activity Yet";
+
+            } else if (score < 40) {
+
+                scoreLabel.textContent =
+                    "Getting Started";
+
+            } else if (score < 70) {
+
+                scoreLabel.textContent =
+                    "Good";
+
+            } else {
+
+                scoreLabel.textContent =
+                    "Excellent";
+            }
+        }
+    }
+
+
+
+    /* =====================================================
+       DASHBOARD
+    ===================================================== */
+
+    function updateDashboard() {
+
+        const distance =
+            getNumber(
+                "zenfitDistance"
+            );
+
+
+        const sessions =
+            getNumber(
+                "zenfitWorkoutSessions"
+            );
+
+
+        const calories =
+            getNumber(
+                "zenfitCalories"
+            );
+
+
+
+        /* DISTANCE */
+
+        const distanceValue =
+            $("distanceTopValue");
+
+
+        const distanceBar =
+            $("distanceProgressBar");
+
+
+        const distanceLabel =
+            $("distanceProgressLabel");
+
+
+        if (distanceValue) {
+
+            distanceValue.textContent =
+                distance.toFixed(1);
+        }
+
+
+        const distancePercent =
+            Math.min(
+                (distance / 5) * 100,
+                100
+            );
+
+
+        if (distanceBar) {
+
+            distanceBar.style.setProperty(
+                "--progress",
+                `${distancePercent}%`
+            );
+        }
+
+
+        if (distanceLabel) {
+
+            distanceLabel.textContent =
+                `${Math.round(distancePercent)}% of your goal`;
+        }
+
+
+
+        /* WORKOUT */
+
+        const workoutValue =
+            $("workoutSessionsValue");
+
+
+        const workoutBar =
+            $("workoutSessionsProgressBar");
+
+
+        const workoutLabel =
+            $("workoutSessionsProgressLabel");
+
+
+        if (workoutValue) {
+
+            workoutValue.textContent =
+                sessions;
+        }
+
+
+        const workoutPercent =
+            Math.min(
+                (sessions / 5) * 100,
+                100
+            );
+
+
+        if (workoutBar) {
+
+            workoutBar.style.setProperty(
+                "--progress",
+                `${workoutPercent}%`
+            );
+        }
+
+
+        if (workoutLabel) {
+
+            workoutLabel.textContent =
+                `${Math.round(workoutPercent)}% of your goal`;
+        }
+
+
+
+        /* CALORIES */
+
+        if (
+            !profile.height ||
+            !profile.weight ||
+            !profile.age
+        ) {
+
+            const calorieValue =
+                $("calorieNeedValue");
+
+
+            const calorieBar =
+                $("calorieNeedProgressBar");
+
+
+            const calorieLabel =
+                $("calorieNeedProgressLabel");
+
+
+            if (calorieValue) {
+                calorieValue.textContent =
+                    calories || 0;
+            }
+
+
+            if (calorieBar) {
+
+                calorieBar.style.setProperty(
+                    "--progress",
+                    calories
+                        ? "50%"
+                        : "0%"
+                );
+            }
+
+
+            if (calorieLabel) {
+
+                calorieLabel.textContent =
+                    calories
+                        ? "Activity calories"
+                        : "Complete profile to calculate";
+            }
+        }
+
+
+        updateFitnessScore();
+    }
+
+
+
+    /* =====================================================
+       HEATMAP
+    ===================================================== */
+
+    function generateHeatmap() {
+
+        const heatmap =
+            $("heatmap");
+
+
+        if (!heatmap) {
+            return;
+        }
+
+
+        heatmap.innerHTML =
+            "";
+
+
+        const activityData =
+            getActivityData();
+
+
+        const totalCells =
+            35;
+
+
+        for (
+            let i = 0;
+            i < totalCells;
+            i++
+        ) {
+
+            const cell =
+                document.createElement("div");
+
+
+            cell.className =
+                "heat-cell";
+
+
+           const level =
+    activityData[i] || 0;
+
+
+cell.dataset.level =
+    level;
+
+
+/* PROFESSIONAL HEAT COLOR */
+
+if(level === 1){
+
+    cell.style.background =
+        "#d9f99d";
+
+}
+else if(level === 2){
+
+    cell.style.background =
+        "#86efac";
+
+}
+else if(level === 3){
+
+    cell.style.background =
+        "#22c55e";
+
+}
+else if(level >= 4){
+
+    cell.style.background =
+        "#15803d";
+
+}
+else{
+
+    cell.style.background =
+        "#edf2f5";
+
+}
+
+
+
+cell.title =
+    level === 0
+        ? "No workout"
+        : `Workout intensity: ${level}/4`;
+
+
+            heatmap.appendChild(
+                cell
+            );
+        }
+    }
+
+
+    function updateHeatmapStats(){
+
+    const sessions =
+        getNumber(
+            "zenfitWorkoutSessions"
+        );
+
+
+    const distance =
+        getNumber(
+            "zenfitDistance"
+        );
+
+
+    const calories =
+        getNumber(
+            "zenfitCalories"
+        );
+
+
+    const days =
+        $("heatWorkoutDays");
+
+
+    const km =
+        $("heatDistance");
+
+
+    const cal =
+        $("heatCalories");
+
+
+
+    if(days){
+        days.textContent =
+            sessions;
+    }
+
+
+    if(km){
+        km.textContent =
+            distance.toFixed(1)+" km";
+    }
+
+
+    if(cal){
+        cal.textContent =
+            calories+" kcal";
+    }
+
+}
+
+
+
+
+    function getActivityData() {
+        let data = [];
+        try {
+            data = JSON.parse(localStorage.getItem("zenfitActivityData") || "[]");
+        } catch(e) { data = []; }
+
+        if (!Array.isArray(data)) data = [];
+
+        let sessions = getNumber("zenfitWorkoutSessions");
+        if (sessions > 0 && data.length === 0) {
+            data = Array.from({ length: Math.min(sessions, 35) }, () => Math.floor(Math.random() * 4) + 1);
+            localStorage.setItem("zenfitActivityData", JSON.stringify(data));
+        }
+
+        let padded = [...data];
+        while (padded.length < 35) {
+            padded.unshift(0);
+        }
+        if (padded.length > 35) {
+            padded = padded.slice(padded.length - 35);
+        }
+        return padded;
+    }
+
+
+
+    /* =====================================================
+       LATEST ACTIVITY
+    ===================================================== */
+
+    /* =====================================================
+       LATEST ACTIVITY (Connected to GPS Tracking)
+    ===================================================== */
+
+    function updateLatestActivity() {
+        let latestSession = null;
+        try {
+            const savedLatest = localStorage.getItem("zenfit_latest_activity");
+            if (savedLatest) {
+                latestSession = JSON.parse(savedLatest);
+            }
+            if (!latestSession) {
+                const sessions = JSON.parse(localStorage.getItem("zenfit_gps_sessions") || "[]");
+                if (Array.isArray(sessions) && sessions.length > 0) {
+                    latestSession = sessions[sessions.length - 1];
+                }
+            }
+        } catch (e) {
+            console.warn("Could not load latest GPS session:", e);
+        }
+
+        const distance = latestSession ? (latestSession.distanceKm || (latestSession.distanceMeters / 1000) || 0) : getNumber("zenfitDistance");
+        const duration = latestSession ? (latestSession.durationText || "00:00") : (localStorage.getItem("zenfitDuration") || "00:00");
+        const calories = latestSession ? (latestSession.calories || 0) : getNumber("zenfitCalories");
+        const activityName = latestSession ? (latestSession.name || "GPS Outdoor Workout") : (localStorage.getItem("zenfitActivityName") || "Outdoor Run Overview");
+        const activityTime = latestSession ? (latestSession.timestamp || "Recently Completed") : (localStorage.getItem("zenfitActivityTime") || "Live GPS Tracking");
+
+        const distanceElement = $("activityDistance");
+        const durationElement = $("activityDuration");
+        const caloriesElement = $("activityCalories");
+        const nameElement = $("activityName");
+        const timeElement = $("activityTime");
+        const badgeElement = $("activityBadge");
+
+        if (distanceElement) distanceElement.textContent = typeof distance === 'number' ? `${distance.toFixed(1)} km` : distance;
+        if (durationElement) durationElement.textContent = duration;
+        if (caloriesElement) caloriesElement.textContent = calories;
+
+        if (nameElement) nameElement.textContent = activityName;
+        if (timeElement) timeElement.textContent = activityTime;
+        if (badgeElement) {
+            badgeElement.textContent = latestSession ? "📍 GPS Verified Route" : "📍 GPS Ready";
+        }
+
+        // Setup Map Container & Redirect Handler (ONLY Map part redirects to gps.html)
+        const mapContainer = $("activityMap");
+        if (mapContainer) {
+            // Add click listener ONLY on map part to direct to gps.html
+            mapContainer.onclick = function (e) {
+                e.stopPropagation();
+                window.location.href = "gps.html";
+            };
+
+            // Render Leaflet Mini Route Map Overview inside activityMap
+            if (typeof L !== 'undefined') {
+                if (window.dashboardMiniMap) {
+                    try { window.dashboardMiniMap.remove(); } catch (err) {}
+                    window.dashboardMiniMap = null;
+                }
+
+                // Preserve or add hover hint tag
+                let hintEl = mapContainer.querySelector(".map-hover-hint");
+                if (!hintEl) {
+                    hintEl = document.createElement("div");
+                    hintEl.className = "map-hover-hint";
+                    hintEl.textContent = "📍 Click map for GPS Tracker ↗";
+                    mapContainer.appendChild(hintEl);
+                }
+
+                try {
+                    const miniMap = L.map("activityMap", {
+                        zoomControl: false,
+                        attributionControl: false,
+                        dragging: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false,
+                        boxZoom: false,
+                        keyboard: false,
+                        touchZoom: false
+                    });
+                    window.dashboardMiniMap = miniMap;
+
+                    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                        maxZoom: 18
+                    }).addTo(miniMap);
+
+                    let routeCoords = [];
+                    if (latestSession && Array.isArray(latestSession.points) && latestSession.points.length > 0) {
+                        routeCoords = latestSession.points.map(pt => [pt.lat, pt.lng]);
+                    } else {
+                        // Sample scenic overview route for visual excellence when no session is recorded yet
+                        routeCoords = [
+                            [28.6139, 77.2090],
+                            [28.6160, 77.2115],
+                            [28.6195, 77.2140],
+                            [28.6210, 77.2185],
+                            [28.6235, 77.2200]
+                        ];
+                    }
+
+                    if (routeCoords.length > 0) {
+                        const polyline = L.polyline(routeCoords, {
+                            color: "#00BCD4",
+                            weight: 5,
+                            opacity: 0.9,
+                            lineJoin: "round"
+                        }).addTo(miniMap);
+
+                        // Start Marker
+                        L.circleMarker(routeCoords[0], {
+                            radius: 6,
+                            fillColor: "#10B981",
+                            color: "#FFFFFF",
+                            weight: 2,
+                            fillOpacity: 1
+                        }).addTo(miniMap);
+
+                        // End Marker
+                        L.circleMarker(routeCoords[routeCoords.length - 1], {
+                            radius: 6,
+                            fillColor: "#FF7043",
+                            color: "#FFFFFF",
+                            weight: 2,
+                            fillOpacity: 1
+                        }).addTo(miniMap);
+
+                        miniMap.fitBounds(polyline.getBounds(), { padding: [18, 18] });
+                    }
+                } catch (mapErr) {
+                    console.warn("Could not render mini Leaflet map:", mapErr);
+                }
+            }
+        }
+    }
+
+
+
+    /* =====================================================
+       BODY DETAILS BUTTON
+    ===================================================== */
+
+    const bodyDetailsBtn =
+        $("bodyDetailsBtn");
+
+
+    // if (bodyDetailsBtn) {
+
+    //     bodyDetailsBtn.addEventListener(
+    //         "click",
+    //         function () {
+
+    //             if (
+    //                 profile.height &&
+    //                 profile.weight
+    //             ) {
+
+    //                 const bmi =
+    //                     $("bmiValue")
+    //                         ? $("bmiValue")
+    //                             .textContent
+    //                         : "--";
+
+
+    //                 alert(
+    //                     `Body Details\n\n` +
+    //                     `BMI: ${bmi}\n` +
+    //                     `Height: ${profile.height} cm\n` +
+    //                     `Weight: ${profile.weight} kg`
+    //                 );
+
+    //             } else {
+
+    //                 openProfileModal();
+
+    //             }
+    //         }
+    //     );
+    // }
+
+
+
+    /* =====================================================
+       NOTIFICATIONS
+    ===================================================== */
+
+    const notifBtn =
+        $("notifBtn");
+
+
+    if (notifBtn) {
+
+        notifBtn.addEventListener(
+            "click",
+            function () {
+
+                alert(
+                    "🔔 You have no new notifications."
+                );
+            }
+        );
+    }
+
+
+
+    /* =====================================================
+       SIDEBAR MENU
+    ===================================================== */
+
+    const menuDashboard =
+        $("menuDashboard");
+
+
+    if (menuDashboard) {
+
+        menuDashboard.addEventListener(
+            "click",
+            function () {
+
+                closeSidebar();
+
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }
+        );
+    }
+
+
+    const menuWorkout =
+$("menuWorkout");
+
+
+if(menuWorkout){
+
+    menuWorkout.addEventListener(
+        "click",
+        function(){
+
+            window.location.href =
+            "workout.html";
+
+        }
+    );
+
+}
+
+
+
+
+    const menuProfile =
+        $("menuProfile");
+
+
+    if (menuProfile) {
+
+        menuProfile.addEventListener(
+            "click",
+            function () {
+
+                closeSidebar();
+
+                openProfileModal();
+            }
+        );
+    }
+
+
+
+const menuHealth = $("menuHealth");
+
+document.getElementById("menuHealth")?.addEventListener("click", function(){
+    closeSidebar();
+    window.location.href = "health.html";
+});
+
+document.getElementById("menuGPS")?.addEventListener("click", function(){
+    closeSidebar();
+    window.location.href = "gps.html";
+});
+
+const menuNutrition = $("menuNutrition");
+
+document.getElementById("menuNutrition")?.addEventListener("click", function(){
+    closeSidebar();
+    window.location.href = "nutrition.html";
+});
+
+
+    const menuAthletes =
+        $("menuAthletes");
+
+
+    if (menuAthletes) {
+
+        menuAthletes.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    "athletes.html";
+            }
+        );
+    }
+
+
+
+    const menuNotifications =
+        $("menuNotifications");
+
+
+    if (menuNotifications) {
+
+        menuNotifications.addEventListener(
+            "click",
+            function () {
+
+                closeSidebar();
+
+
+                if (notifBtn) {
+                    notifBtn.click();
+                }
+            }
+        );
+    }
+
+
+
+    /* =====================================================
+       RESET DASHBOARD
+    ===================================================== */
+
+    if (menuReset) {
+        menuReset.addEventListener(
+            "click",
+            function () {
+                const confirmed = confirm(
+                    "Reset all saved ZENFIT activity and body metrics? (Your username & email will be preserved)"
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                // Preserve username, email, password
+                let preservedName = profile.name || "User";
+                let preservedEmail = profile.email || "user@zenfit.com";
+                let preservedPassword = profile.password || "";
+
+                try {
+                    const active = JSON.parse(localStorage.getItem("zenfit_user") || "null");
+                    if (active) {
+                        preservedName = active.fullName || active.name || preservedName;
+                        preservedEmail = active.email || preservedEmail;
+                        if (active.password) preservedPassword = active.password;
+                    }
+                } catch(e) {}
+
+                const keys = [
+                    "zenfitProfile",
+                    "zenfitDistance",
+                    "zenfitWorkoutSessions",
+                    "zenfitCalories",
+                    "zenfitDuration",
+                    "zenfitActivityName",
+                    "zenfitActivityTime",
+                    "zenfitActivityData",
+                    "zenfitMealData",
+                    "zenfitSleepData",
+                    "zenfitWaterIntake"
+                ];
+
+                keys.forEach(function (key) {
+                    localStorage.removeItem(key);
+                });
+
+                const resetProfile = {
+                    name: preservedName,
+                    email: preservedEmail,
+                    phone: "",
+                    password: preservedPassword,
+                    gender: "",
+                    age: "",
+                    height: "",
+                    weight: "",
+                    bodyFat: "",
+                    goal: ""
+                };
+
+                const resetUser = {
+                    fullName: preservedName,
+                    name: preservedName,
+                    email: preservedEmail,
+                    password: preservedPassword,
+                    gender: "",
+                    age: "",
+                    height: "",
+                    weight: "",
+                    goal: "",
+                    fitnessGoal: "",
+                    bmi: null
+                };
+
+                localStorage.setItem("zenfitProfile", JSON.stringify(resetProfile));
+                localStorage.setItem("zenfit_user", JSON.stringify(resetUser));
+
+                profile = resetProfile;
+
+                updateProfileUI();
+                calculateBodyStats();
+                updateDashboard();
+                updateLatestActivity();
+                generateHeatmap();
+                updateFitnessScore();
+
+                closeSidebar();
+                alert("Activity metrics reset successfully! Username and email preserved.");
+            }
+        );
+    }
+
+
+
+    /* =====================================================
+       BOTTOM TABS
+    ===================================================== */
+
+    const tabs =
+        document.querySelectorAll(
+            ".bottom-tab"
+        );
+
+
+    tabs.forEach(function (tab) {
+
+        tab.addEventListener(
+            "click",
+            function () {
+
+
+                tabs.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "active"
+                        );
+                    }
+                );
+
+
+                tab.classList.add(
+                    "active"
+                );
+
+
+
+                /* DAILY */
+
+                if (
+                    tab.id ===
+                    "tab-daily"
+                ) {
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+                }
+
+
+
+                /* HEALTH */
+
+                if(tab.id === "tab-health") {
+                    window.location.href = "health.html";
+                }
+
+
+
+                /* ATHLETES */
+
+                if (
+                    tab.id ===
+                    "tab-athletes"
+                ) {
+
+                    window.location.href =
+                        "athletes.html";
+                }
+
+            }
+        );
+    });
+
+
+
+    /* =====================================================
+       ESC KEY
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key !==
+                "Escape"
+            ) {
+                return;
+            }
+
+
+            closeSidebar();
+            closeProfileModal();
+
+        }
+    );
+
+
+
+    /* =====================================================
+       CLICK OUTSIDE / ESC
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter" &&
+                event.target ===
+                $("editConfirmPassword")
+            ) {
+
+                event.preventDefault();
+
+                if (saveProfileChanges) {
+                    saveProfileChanges.click();
+                }
+            }
+        }
+    );
+
+
+
+    /* =====================================================
+       UPDATE MONTH
+    ===================================================== */
+
+    function updateHeatmapMonth() {
+
+        const monthElement =
+            $("heatmapMonth");
+
+
+        if (!monthElement) {
+            return;
+        }
+
+
+        const date =
+            new Date();
+
+
+        const month =
+            date.toLocaleString(
+                "en-US",
+                {
+                    month: "long"
+                }
+            );
+
+
+        const year =
+            date.getFullYear();
+
+
+        monthElement.textContent =
+            `${month} ${year}`;
+    }
+
+
+
+    /* =====================================================
+       INITIAL LOAD
+    ===================================================== */
+
+    updateProfileUI();
+
+    calculateBodyStats();
+
+    updateDashboard();
+
+    updateLatestActivity();
+
+    updateHeatmapMonth();
+
+    generateHeatmap();
+
+    updateHeatmapStats();
+
+
+    console.log(
+        "ZENFIT Dashboard: READY"
+    );
+
+});
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+
+const user =
+JSON.parse(
+localStorage.getItem("zenfit_user")
+);
+
+
+
+if(!user) return;
+
+
+
+let name =
+document.getElementById("userName");
+
+
+if(name){
+
+name.innerHTML =
+user.fullName;
+
+}
+
+
+
+});
+
+
+document.getElementById("tab-health")?.addEventListener("click", function(){
+    window.location.href = "health.html";
+});
 

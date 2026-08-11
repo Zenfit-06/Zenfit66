@@ -26,31 +26,73 @@ function initHealthDashboard(user) {
 }
 
 /**
+ * Setup sidebar toggle and backdrop
+ */
+function setupSidebarToggle() {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop') || document.getElementById('sidebarOverlay');
+  const sidebarCloseBtn = document.getElementById('sidebarCloseBtn') || document.getElementById('sidebarClose');
+
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.body.classList.add('sidebar-open');
+    });
+  }
+
+  if (sidebarCloseBtn) {
+    sidebarCloseBtn.addEventListener('click', () => {
+      document.body.classList.remove('sidebar-open');
+    });
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', () => {
+      document.body.classList.remove('sidebar-open');
+    });
+  }
+}
+
+/**
  * Setup user information in header and sidebar
  */
 function setupUserInfo(user) {
-  const fullName = user.fullName || user.name || 'Akshay Kumar';
+  let rawName = user.fullName || user.name || user.email || 'User';
+  if (rawName.includes('@')) {
+    const parts = rawName.split('@');
+    if (parts[0]) rawName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+  }
+  const fullName = rawName;
+
   const avatarInitials = fullName
     .split(' ')
+    .filter(Boolean)
     .map(n => n[0])
     .join('')
     .substring(0, 2)
-    .toUpperCase();
+    .toUpperCase() || 'U';
 
   // Header & Sidebar Initials
   const headerAvatarTextEl = document.getElementById('userAvatarBadgeText');
   if (headerAvatarTextEl) {
-    headerAvatarTextEl.textContent = avatarInitials || 'AK';
+    headerAvatarTextEl.textContent = avatarInitials;
   } else {
     const headerAvatarEl = document.getElementById('userAvatarBadge');
-    if (headerAvatarEl && headerAvatarEl.firstChild) headerAvatarEl.firstChild.textContent = avatarInitials || 'AK';
+    if (headerAvatarEl && headerAvatarEl.firstChild) headerAvatarEl.firstChild.textContent = avatarInitials;
   }
 
   const sidebarAvatarEl = document.getElementById('sidebarAvatar');
-  if (sidebarAvatarEl) sidebarAvatarEl.textContent = avatarInitials || 'AK';
+  if (sidebarAvatarEl) sidebarAvatarEl.textContent = avatarInitials;
 
   const sidebarNameEl = document.getElementById('sidebarUserName');
   if (sidebarNameEl) sidebarNameEl.textContent = fullName;
+
+  const sidebarBadgeEl = document.getElementById('sidebarUserBadge');
+  if (sidebarBadgeEl) {
+    sidebarBadgeEl.textContent = '👑 Pro Member 👋';
+    sidebarBadgeEl.style.color = '#FF7043';
+    sidebarBadgeEl.style.fontWeight = '600';
+  }
 
   // Dynamic Height
   const heightValEl = document.getElementById('heightValueText');
@@ -197,7 +239,7 @@ function renderSleepGraph(data) {
 
   const width = 850;
   const height = 220;
-  const paddingLeft = 50;
+  const paddingLeft = 70;
   const paddingRight = 30;
   const paddingTop = 35;
   const paddingBottom = 30;
@@ -236,23 +278,34 @@ function renderSleepGraph(data) {
     const y = paddingTop + chartHeight - (tick / maxVal) * chartHeight;
     gridSvg += `
       <line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="#F1F5F9" stroke-width="1.5" stroke-dasharray="0" />
-      <text x="${paddingLeft - 12}" y="${y + 4}" fill="#94A3B8" font-size="11" font-weight="500" text-anchor="end">${tick}h</text>
+      <text x="${paddingLeft - 18}" y="${y + 4}" fill="#94A3B8" font-size="11" font-weight="500" text-anchor="end">${tick}h</text>
     `;
   });
 
   // Markers & Labels SVG
   let pointsSvg = '';
-  points.forEach(p => {
+  points.forEach((p, idx) => {
+    // Adjust text alignment for the first data point to keep it clear of Y-axis ticks
+    let textAnchor = 'middle';
+    let textX = p.x;
+    if (idx === 0) {
+      textAnchor = 'start';
+      textX = p.x - 5;
+    } else if (idx === points.length - 1 && !p.highlight) {
+      textAnchor = 'end';
+      textX = p.x + 5;
+    }
+
     // Value text floating above dot if defined
     let valueText = `
-      <text x="${p.x}" y="${p.y - 10}" fill="${p.highlight ? '#7C3AED' : '#64748B'}" font-size="11" font-weight="${p.highlight ? '700' : '600'}" text-anchor="middle">${p.label}</text>
+      <text x="${textX}" y="${p.y - 10}" fill="${p.highlight ? '#00838F' : '#64748B'}" font-size="11" font-weight="${p.highlight ? '700' : '600'}" text-anchor="${textAnchor}">${p.label}</text>
     `;
 
     // Sunday Callout Badge
     if (p.highlight) {
       valueText = `
         <g transform="translate(${p.x}, ${p.y - 28})">
-          <rect x="-30" y="-12" width="60" height="22" rx="11" fill="#7C3AED" />
+          <rect x="-30" y="-12" width="60" height="22" rx="11" fill="#00838F" />
           <text x="0" y="3" fill="#FFFFFF" font-size="11" font-weight="700" text-anchor="middle">${p.label}</text>
         </g>
       `;
@@ -260,7 +313,7 @@ function renderSleepGraph(data) {
 
     pointsSvg += `
       ${valueText}
-      <circle cx="${p.x}" cy="${p.y}" r="${p.highlight ? 6 : 5}" fill="${p.highlight ? '#7C3AED' : '#8B5CF6'}" stroke="#FFFFFF" stroke-width="2.5" />
+      <circle cx="${p.x}" cy="${p.y}" r="${p.highlight ? 6 : 5}" fill="${p.highlight ? '#00838F' : '#00BCD4'}" stroke="#FFFFFF" stroke-width="2.5" />
     `;
   });
 
@@ -268,8 +321,8 @@ function renderSleepGraph(data) {
     <svg viewBox="0 0 ${width} ${height}" class="sleep-chart-svg" preserveAspectRatio="none">
       <defs>
         <linearGradient id="sleepGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.25" />
-          <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.0" />
+          <stop offset="0%" stop-color="#00BCD4" stop-opacity="0.25" />
+          <stop offset="100%" stop-color="#00BCD4" stop-opacity="0.0" />
         </linearGradient>
       </defs>
 
@@ -280,7 +333,7 @@ function renderSleepGraph(data) {
       <path d="${areaD}" fill="url(#sleepGradient)" />
 
       <!-- Smooth Curve Line -->
-      <path d="${pathD}" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" />
+      <path d="${pathD}" fill="none" stroke="#00BCD4" stroke-width="3" stroke-linecap="round" />
 
       <!-- Data Points & Callout Badges -->
       ${pointsSvg}
@@ -365,6 +418,13 @@ function setupHeightRuler() {
       currentUser.height = currentHeight;
       currentUser.bmi = newBmi;
       localStorage.setItem('zenfit_user', JSON.stringify(currentUser));
+
+      try {
+        const prof = JSON.parse(localStorage.getItem('zenfitProfile') || '{}');
+        prof.height = currentHeight;
+        prof.bmi = newBmi;
+        localStorage.setItem('zenfitProfile', JSON.stringify(prof));
+      } catch (e) {}
 
       const users = JSON.parse(localStorage.getItem('zenfit_users') || '[]');
       const idx = users.findIndex(u => u.id === currentUser.id || (u.email && u.email.toLowerCase() === currentUser.email?.toLowerCase()));
@@ -477,6 +537,12 @@ function setupBottomTabs() {
   if (yogaTab) {
     yogaTab.addEventListener('click', () => {
       window.location.href = 'yoga.html';
+    });
+  }
+  const nutritionTab = document.getElementById('tab-nutrition');
+  if (nutritionTab) {
+    nutritionTab.addEventListener('click', () => {
+      window.location.href = 'nutrition.html';
     });
   }
 }

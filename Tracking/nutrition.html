@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ZENFIT Nutrition — Track your daily meals, macros, hydration, and build a healthier diet.">
+  <title>ZENFIT — Nutrition & Diet</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/nutrition.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- ===== SIDEBAR BACKDROP ===== -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-group">
+        <div class="sidebar-logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <span class="sidebar-logo-text">ZENFIT</span>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-profile-lower" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin: 8px 12px 16px 12px; background: rgba(0, 188, 212, 0.06); border-radius: 14px; border: 1px solid rgba(0, 188, 212, 0.12);">
+      <div class="profile-avatar" id="sidebarAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00838F, #00BCD4); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem;">U</div>
+      <div class="profile-details" style="display: flex; flex-direction: column;">
+        <span class="profile-name" id="sidebarUserName" style="font-weight: 700; color: #0F172A; font-size: 0.95rem;">User</span>
+        <span class="profile-badge" id="sidebarUserBadge" style="color: #FF7043; font-weight: 600; font-size: 0.82rem; margin-top: 2px;">👑 Pro Member 👋</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="health.html" class="nav-item" id="nav-health">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>Health</span>
+      </a>
+      <a href="nutrition.html" class="nav-item active" id="nav-nutrition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+        <span>Nutrition</span>
+      </a>
+      <a href="personal_details.html" class="nav-item" id="nav-personal-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21a8 8 0 0 0-16 0"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Personal Details</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-profile-lower">
+      <div class="profile-avatar" id="sidebarAvatar">AK</div>
+      <div class="profile-details">
+        <span class="profile-name" id="sidebarUserName">User</span>
+        <span class="profile-badge">👑 Pro Member 👋</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Log Out</span>
+    </button>
+  </aside>
+
+  <!-- ================= HEADER ================= -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div>
+        <h1 class="greeting">
+          Nutrition Dashboard <span style="font-size: 1.4rem;">🥗</span>
+        </h1>
+        <p class="greeting-sub">Fuel your body right, transform your health</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 10px; margin-right: 12px;">
+        <div class="sidebar-logo-icon" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00838F, #00BCD4); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <span style="font-size: 1.3rem; font-weight: 800; color: #0F172A; letter-spacing: -0.03em;">ZENFIT</span>
+      </div>
+      <button class="header-icon-btn" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+      </button>
+      <div class="header-avatar" id="headerAvatar" role="button" tabindex="0" title="Edit Profile" onclick="window.location.href='personal_details.html'">
+        <span id="headerAvatarText">AK</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content">
+
+    <!-- ===== TOP STATS GRID ===== -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon-wrapper turquoise">
+          <i class="fa-solid fa-fire-flame-curved"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Calories Today</h3>
+          <h1 id="caloriesValue">1,820</h1>
+          <p>of <span id="caloriesGoalText">2,200</span> kcal target</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper aqua">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Calories Remaining</h3>
+          <h1 id="caloriesRemainingValue">380</h1>
+          <p id="caloriesStatusText">380 kcal left for today</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrapper coral">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Meals Logged</h3>
+          <h1 id="mealsValue">4 / 5</h1>
+          <p id="mealsStatusText">Today's meals</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION HEADER ===== -->
+    <section class="practice-header">
+      <span class="practice-subtag">YOUR DAILY NUTRITION</span>
+      <h2 class="practice-title">Balanced Diet & Meal Plans</h2>
+      <p class="practice-desc">
+        Proper nutrition is the foundation of a healthy life. Track your daily calories, manage your macros, log meals, and customize your diet plan.
+      </p>
+    </section>
+
+    <!-- ===== MACROS OVERVIEW ===== -->
+    <section class="macros-overview">
+      <div class="macros-overview-header">
+        <h3><i class="fa-solid fa-chart-pie"></i> Today's Macros Breakdown</h3>
+        <div class="macros-toggle-group">
+          <button class="macros-toggle active" data-period="today">Today</button>
+          <button class="macros-toggle" data-period="week">This Week</button>
+        </div>
+      </div>
+      <div class="macros-grid">
+        <div class="macro-ring-card" id="proteinCard">
+          <div class="ring-container">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#E0F7FA" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#00BCD4" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="79" stroke-linecap="round" class="ring-progress" data-target="70"/>
+            </svg>
+            <div class="ring-label" id="proteinRingPct">70%</div>
+          </div>
+          <div class="macro-ring-info">
+            <span class="macro-ring-name">Protein</span>
+            <span class="macro-ring-amount" id="proteinRingAmount">98g <span class="macro-ring-goal">/ 140g</span></span>
+          </div>
+        </div>
+        <div class="macro-ring-card" id="carbsCard">
+          <div class="ring-container">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#E0F2F1" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#009688" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="53" stroke-linecap="round" class="ring-progress" data-target="80"/>
+            </svg>
+            <div class="ring-label" id="carbsRingPct">80%</div>
+          </div>
+          <div class="macro-ring-info">
+            <span class="macro-ring-name">Carbs</span>
+            <span class="macro-ring-amount" id="carbsRingAmount">248g <span class="macro-ring-goal">/ 310g</span></span>
+          </div>
+        </div>
+        <div class="macro-ring-card" id="fatsCard">
+          <div class="ring-container">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#FFF3E0" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#FF7043" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="119" stroke-linecap="round" class="ring-progress" data-target="56"/>
+            </svg>
+            <div class="ring-label" id="fatsRingPct">56%</div>
+          </div>
+          <div class="macro-ring-info">
+            <span class="macro-ring-name">Fats</span>
+            <span class="macro-ring-amount" id="fatsRingAmount">28g <span class="macro-ring-goal">/ 50g</span></span>
+          </div>
+        </div>
+        <div class="macro-ring-card" id="fiberCard">
+          <div class="ring-container">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#E8F5E9" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#66BB6A" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="132" stroke-linecap="round" class="ring-progress" data-target="50"/>
+            </svg>
+            <div class="ring-label" id="fiberRingPct">50%</div>
+          </div>
+          <div class="macro-ring-info">
+            <span class="macro-ring-name">Fiber</span>
+            <span class="macro-ring-amount" id="fiberRingAmount">15g <span class="macro-ring-goal">/ 30g</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CALORIES REMAINING SECTION ===== -->
+    <section class="calories-remaining-section" id="caloriesRemainingSection">
+      <div class="cal-rem-header">
+        <div>
+          <span class="practice-subtag">DAILY OVERVIEW</span>
+          <h3><i class="fa-solid fa-fire-flame-curved"></i> Today's Nutrition & Calories Remaining</h3>
+        </div>
+        <div class="cal-rem-badge" id="calRemBadge">
+          <span class="badge-num" id="calRemNum">380</span> kcal remaining
+        </div>
+      </div>
+
+      <div class="cal-rem-main">
+        <div class="cal-progress-info">
+          <div class="cal-progress-labels">
+            <span class="cal-consumed-text"><strong id="calConsumedVal">1,820</strong> / <span id="calTargetVal">2,200</span> kcal consumed</span>
+            <span class="cal-pct-text" id="calPctText">83% achieved</span>
+          </div>
+          <div class="cal-progress-track">
+            <div class="cal-progress-fill" id="calProgressFill" style="width: 83%;"></div>
+          </div>
+        </div>
+
+        <div class="cal-macro-bars-grid">
+          <div class="cal-macro-mini">
+            <div class="mini-macro-header">
+              <span><i class="fa-solid fa-dumbbell" style="color: #00BCD4;"></i> Protein</span>
+              <span id="proteinBarVal">98g / 140g</span>
+            </div>
+            <div class="mini-bar-track"><div class="mini-bar-fill protein" id="proteinBarFill" style="width: 70%;"></div></div>
+          </div>
+          <div class="cal-macro-mini">
+            <div class="mini-macro-header">
+              <span><i class="fa-solid fa-wheat-awn" style="color: #009688;"></i> Carbs</span>
+              <span id="carbsBarVal">248g / 310g</span>
+            </div>
+            <div class="mini-bar-track"><div class="mini-bar-fill carbs" id="carbsBarFill" style="width: 80%;"></div></div>
+          </div>
+          <div class="cal-macro-mini">
+            <div class="mini-macro-header">
+              <span><i class="fa-solid fa-droplet" style="color: #FF7043;"></i> Fats</span>
+              <span id="fatsBarVal">28g / 50g</span>
+            </div>
+            <div class="mini-bar-track"><div class="mini-bar-fill fats" id="fatsBarFill" style="width: 56%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DAILY MEALS HEADER ===== -->
+    <section class="practice-header meal-plan-header" style="margin-top: 50px;">
+      <span class="practice-subtag">DAILY MEALS</span>
+      <h2 class="practice-title">Your Meal Plan</h2>
+      <p class="practice-desc">
+        Each meal is thoughtfully balanced with the right macros. Log your meals, track your intake, and stay on target.
+      </p>
+      <div class="meal-plan-actions">
+        <button class="btn-quick-add" id="quickAddBtn">
+          <i class="fa-solid fa-bolt"></i> Quick Add
+        </button>
+        <button class="btn-customize-plan" id="customizePlanBtn">
+          <i class="fa-solid fa-sliders"></i> Customize Plan
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== MEAL PLAN FULL-WIDTH LAYOUT ===== -->
+    <section class="meal-plan-layout">
+      <!-- Meal Cards (Full Width) -->
+      <div class="meal-plan-main" style="width: 100%;">
+        <div class="poses-list" id="mealsList">
+          <!-- Dynamic Meal Cards Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WEEKLY NUTRITION CHART ===== -->
+    <section class="weekly-chart-section">
+      <div class="weekly-chart-header">
+        <div>
+          <span class="practice-subtag">TRENDS & ADHERENCE</span>
+          <h3><i class="fa-solid fa-chart-column"></i> Weekly Progress & Analytics</h3>
+        </div>
+        <div class="weekly-chart-controls">
+          <div class="weekly-metric-tabs">
+            <button class="weekly-metric-tab active" data-metric="calories">Calories</button>
+            <button class="weekly-metric-tab" data-metric="protein">Protein</button>
+            <button class="weekly-metric-tab" data-metric="carbs">Carbs</button>
+            <button class="weekly-metric-tab" data-metric="fats">Fats</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Summary Stat Cards -->
+      <div class="weekly-summary-grid">
+        <div class="weekly-summary-card">
+          <div class="summary-icon"><i class="fa-solid fa-fire"></i></div>
+          <div class="summary-info">
+            <span class="summary-label">Avg Calories</span>
+            <h4 class="summary-val" id="statAvgCalories">2,050 kcal</h4>
+            <span class="summary-sub">daily average</span>
+          </div>
+        </div>
+        <div class="weekly-summary-card">
+          <div class="summary-icon"><i class="fa-solid fa-dumbbell"></i></div>
+          <div class="summary-info">
+            <span class="summary-label">Avg Protein</span>
+            <h4 class="summary-val" id="statAvgProtein">132g / day</h4>
+            <span class="summary-sub">target: 140g</span>
+          </div>
+        </div>
+        <div class="weekly-summary-card">
+          <div class="summary-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="summary-info">
+            <span class="summary-label">Plan Adherence</span>
+            <h4 class="summary-val" id="statAdherence">94%</h4>
+            <span class="summary-sub">target hit rate</span>
+          </div>
+        </div>
+        <div class="weekly-summary-card">
+          <div class="summary-icon"><i class="fa-solid fa-utensils"></i></div>
+          <div class="summary-info">
+            <span class="summary-label">Meals Logged</span>
+            <h4 class="summary-val" id="statMealsLogged">28 / 35</h4>
+            <span class="summary-sub">this week</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="weekly-chart-legend">
+        <span class="legend-item"><span class="legend-dot consumed"></span> Consumed</span>
+        <span class="legend-item"><span class="legend-dot target"></span> Target</span>
+      </div>
+
+      <div class="weekly-bars" id="weeklyBars">
+        <!-- Bars dynamically rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ===== NUTRITION KNOWLEDGE SECTION ===== -->
+    <section class="tips-section">
+      <div class="tips-header">
+        <span class="practice-subtag">INTERACTIVE GUIDE</span>
+        <h3 class="tips-title">Nutrition Knowledge & Superfoods</h3>
+        <p style="font-size: 0.9rem; color: var(--text-medium); margin-top: 4px;">
+          Click any nutrient category to explore food benefits, vitamins, and dietary science.
+        </p>
+      </div>
+      <div class="tips-grid" id="knowledgeGrid">
+        <div class="tip-card clickable" data-category="vegetables">
+          <div class="tip-icon">🥦</div>
+          <h4>Vegetables & Nutrients</h4>
+          <p>Broccoli, Spinach, Kale & Bell Peppers. Rich in Vitamin C, Iron & Fiber.</p>
+          <span class="card-explore-btn"><i class="fa-solid fa-arrow-right"></i> Explore Foods</span>
+        </div>
+        <div class="tip-card clickable" data-category="proteins">
+          <div class="tip-icon">🥩</div>
+          <h4>Essential Proteins</h4>
+          <p>Salmon, Eggs, Greek Yogurt & Tofu. Supports muscle repair & cellular growth.</p>
+          <span class="card-explore-btn"><i class="fa-solid fa-arrow-right"></i> Explore Foods</span>
+        </div>
+        <div class="tip-card clickable" data-category="bodyNeeds">
+          <div class="tip-icon">⚡</div>
+          <h4>What the Body Needs</h4>
+          <p>Complex Carbs, Fiber, Electrolytes & Hydration for peak metabolic health.</p>
+          <span class="card-explore-btn"><i class="fa-solid fa-arrow-right"></i> Explore Foods</span>
+        </div>
+        <div class="tip-card clickable" data-category="fatsSuperfoods">
+          <div class="tip-icon">🥑</div>
+          <h4>Healthy Fats & Superfoods</h4>
+          <p>Avocados, Chia Seeds, Almonds & Berries. Rich in Omega-3 & Antioxidants.</p>
+          <span class="card-explore-btn"><i class="fa-solid fa-arrow-right"></i> Explore Foods</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== BOTTOM TABS NAV ===== -->
+  <div class="bottom-tabs">
+    <button class="tab" id="tab-daily" onclick="window.location.href='dashboard.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <span>Daily</span>
+    </button>
+    <button class="tab" id="tab-health" onclick="window.location.href='health.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      <span>Health</span>
+    </button>
+    <button class="tab" id="tab-athletes" onclick="window.location.href='athletes.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span>Athletes</span>
+    </button>
+  </div>
+
+  <!-- ===== MODAL 1: MEAL LOG SUCCESS MODAL ===== -->
+  <div class="modal" id="mealLogModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close modal">&times;</button>
+      <h2 id="modalMealTitle" style="font-size: 1.5rem; font-weight:800; margin-bottom:6px;">Breakfast</h2>
+      <p style="font-size:0.85rem; color:var(--text-medium);">Meal logged successfully!</p>
+
+      <div class="meal-log-success">
+        <div class="success-checkmark">
+          <svg viewBox="0 0 52 52" class="checkmark-svg">
+            <circle cx="26" cy="26" r="25" fill="none" stroke="#00BCD4" stroke-width="2" class="checkmark-circle"/>
+            <path fill="none" stroke="#00BCD4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14.1 27.2l7.1 7.2 16.7-16.8" class="checkmark-check"/>
+          </svg>
+        </div>
+        <div class="success-stats">
+          <div class="success-stat"><span class="success-label">Calories</span><span class="success-value" id="modalCalories">420</span></div>
+          <div class="success-stat"><span class="success-label">Protein</span><span class="success-value" id="modalProtein">18g</span></div>
+          <div class="success-stat"><span class="success-label">Carbs</span><span class="success-value" id="modalCarbs">62g</span></div>
+          <div class="success-stat"><span class="success-label">Fats</span><span class="success-value" id="modalFats">12g</span></div>
+        </div>
+      </div>
+
+      <button class="btn-start-practice" id="modalDoneBtn" style="margin: 10px auto 0;">
+        <i class="fa-solid fa-check-double"></i> Done
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 2: MEAL DETAILS MODAL ===== -->
+  <div class="modal" id="mealDetailsModal">
+    <div class="modal-card large-modal">
+      <button class="modal-close" id="detailsModalCloseBtn" aria-label="Close modal">&times;</button>
+      <div class="details-modal-header">
+        <div class="details-emoji" id="detailsMealEmoji">🥣</div>
+        <div>
+          <span class="pose-tag" id="detailsMealTag">BREAKFAST</span>
+          <h2 id="detailsMealTitle">Oatmeal Power Bowl</h2>
+          <div class="meal-time-badge" style="position:static; display:inline-flex; margin-top:4px;" id="detailsMealTime">
+            <i class="fa-regular fa-clock"></i> 7:30 AM
+          </div>
+        </div>
+      </div>
+
+      <div class="details-body">
+        <p class="details-desc" id="detailsMealDesc">
+          Steel-cut oats topped with fresh berries, chia seeds, almonds, and honey.
+        </p>
+
+        <div class="details-section">
+          <h4><i class="fa-solid fa-chart-pie"></i> Nutrition Breakdown</h4>
+          <div class="details-macros-grid">
+            <div class="macro-box"><span class="m-val" id="detailsCal">420</span><span class="m-lbl">Calories (kcal)</span></div>
+            <div class="macro-box"><span class="m-val" id="detailsProtein">18g</span><span class="m-lbl">Protein</span></div>
+            <div class="macro-box"><span class="m-val" id="detailsCarbs">62g</span><span class="m-lbl">Carbs</span></div>
+            <div class="macro-box"><span class="m-val" id="detailsFats">12g</span><span class="m-lbl">Fats</span></div>
+            <div class="macro-box"><span class="m-val" id="detailsFiber">8g</span><span class="m-lbl">Fiber</span></div>
+            <div class="macro-box"><span class="m-val" id="detailsPrepTime">12 min</span><span class="m-lbl">Prep Time</span></div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="sec-header-between">
+            <h4><i class="fa-solid fa-list-check"></i> Ingredients</h4>
+            <button class="btn-grocery" id="addGroceryBtn"><i class="fa-solid fa-cart-plus"></i> Add to Grocery List</button>
+          </div>
+          <ul class="ingredients-list" id="detailsIngredientsList">
+            <!-- Dynamic ingredients -->
+          </ul>
+        </div>
+
+        <div class="details-section">
+          <h4><i class="fa-solid fa-kitchen-set"></i> Preparation & Recipe Instructions</h4>
+          <ol class="recipe-steps" id="detailsRecipeSteps">
+            <!-- Dynamic recipe steps -->
+          </ol>
+        </div>
+
+        <div class="details-row-two">
+          <div class="details-section half">
+            <h4><i class="fa-solid fa-arrows-rotate"></i> Substitutions</h4>
+            <p class="sub-text" id="detailsSubstitutions">Swap almonds with walnuts or chia seeds for seeds-only option.</p>
+          </div>
+          <div class="details-section half">
+            <h4><i class="fa-solid fa-shield-halved"></i> Allergens</h4>
+            <div class="allergens-tags" id="detailsAllergens">
+              <span class="allergen-tag">Tree Nuts</span>
+              <span class="allergen-tag">Gluten-Free Option</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-start-practice" id="detailsLogMealBtn"><i class="fa-solid fa-check"></i> Log This Meal</button>
+        <button class="btn-secondary" id="detailsCloseBottomBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 3: ADD MEAL MODAL ===== -->
+  <div class="modal" id="addMealModal">
+    <div class="modal-card large-modal">
+      <button class="modal-close" id="addMealCloseBtn">&times;</button>
+      <h2><i class="fa-solid fa-plus-circle" style="color: var(--primary-turquoise);"></i> Add New Meal</h2>
+      <p style="font-size:0.85rem; color:var(--text-medium); margin-bottom: 20px;">
+        Add a custom meal to your daily nutrition plan.
+      </p>
+
+      <form id="addMealForm" class="meal-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Meal Type / Tag</label>
+            <select id="addMealTag" required>
+              <option value="BREAKFAST">BREAKFAST</option>
+              <option value="MORNING SNACK">MORNING SNACK</option>
+              <option value="LUNCH">LUNCH</option>
+              <option value="AFTERNOON SNACK">AFTERNOON SNACK</option>
+              <option value="DINNER">DINNER</option>
+              <option value="EVENING SNACK">EVENING SNACK</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Meal Name</label>
+            <input type="text" id="addMealName" placeholder="e.g. Avocado Toast with Egg" required>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="text" id="addMealTime" placeholder="e.g. 8:30 AM" required>
+          </div>
+          <div class="form-group">
+            <label>Emoji / Icon</label>
+            <select id="addMealEmoji">
+              <option value="🥣">🥣 Bowl / Oats</option>
+              <option value="🥑">🥑 Avocado Toast</option>
+              <option value="🥗">🥗 Salad / Bowl</option>
+              <option value="🍎">🍎 Fruit / Apple</option>
+              <option value="🥤">🥤 Smoothie / Shake</option>
+              <option value="🍛">🍛 Curry / Rice</option>
+              <option value="🥪">🥪 Sandwich / Wrap</option>
+              <option value="🍳">🍳 Eggs / Omelet</option>
+              <option value="🍱">🍱 Bento / Meal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Calories (kcal)</label>
+            <input type="number" id="addMealCalories" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" placeholder="e.g. 350" required>
+          </div>
+          <div class="form-group">
+            <label>Protein (g)</label>
+            <input type="number" id="addMealProtein" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" placeholder="e.g. 20" required>
+          </div>
+          <div class="form-group">
+            <label>Carbs (g)</label>
+            <input type="number" id="addMealCarbs" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" placeholder="e.g. 45" required>
+          </div>
+          <div class="form-group">
+            <label>Fats (g)</label>
+            <input type="number" id="addMealFats" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" placeholder="e.g. 12" required>
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea id="addMealDesc" rows="2" placeholder="Short summary of this meal..." required></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Ingredients (comma separated)</label>
+            <input type="text" id="addMealIngredients" placeholder="e.g. 2 Slices Whole Grain Bread, 1 Avocado, 2 Eggs, Chili Flakes">
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:20px;">
+          <button type="submit" class="btn-start-practice" style="width:100%; justify-center;"><i class="fa-solid fa-save"></i> Save Meal to Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 4: EDIT MEAL MODAL ===== -->
+  <div class="modal" id="editMealModal">
+    <div class="modal-card large-modal">
+      <button class="modal-close" id="editMealCloseBtn">&times;</button>
+      <h2><i class="fa-solid fa-pen-to-square" style="color: var(--primary-turquoise);"></i> Edit Meal</h2>
+      <form id="editMealForm" class="meal-form">
+        <input type="hidden" id="editMealId">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Meal Type / Tag</label>
+            <select id="editMealTag" required>
+              <option value="BREAKFAST">BREAKFAST</option>
+              <option value="MORNING SNACK">MORNING SNACK</option>
+              <option value="LUNCH">LUNCH</option>
+              <option value="AFTERNOON SNACK">AFTERNOON SNACK</option>
+              <option value="DINNER">DINNER</option>
+              <option value="EVENING SNACK">EVENING SNACK</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Meal Name</label>
+            <input type="text" id="editMealName" required>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="text" id="editMealTime" required>
+          </div>
+          <div class="form-group">
+            <label>Calories (kcal)</label>
+            <input type="number" id="editMealCalories" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" required>
+          </div>
+          <div class="form-group">
+            <label>Protein (g)</label>
+            <input type="number" id="editMealProtein" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" required>
+          </div>
+          <div class="form-group">
+            <label>Carbs (g)</label>
+            <input type="number" id="editMealCarbs" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" required>
+          </div>
+          <div class="form-group">
+            <label>Fats (g)</label>
+            <input type="number" id="editMealFats" min="0" onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()" oninput="if(this.value < 0) this.value = Math.abs(this.value);" required>
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea id="editMealDesc" rows="2" required></textarea>
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:20px;">
+          <button type="submit" class="btn-start-practice" style="width:100%; justify-center;"><i class="fa-solid fa-check"></i> Update Meal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 5: SWAP MEAL MODAL ===== -->
+  <div class="modal" id="swapMealModal">
+    <div class="modal-card">
+      <button class="modal-close" id="swapMealCloseBtn">&times;</button>
+      <h2><i class="fa-solid fa-arrows-rotate" style="color: var(--primary-turquoise);"></i> Swap Meal</h2>
+      <p style="font-size:0.85rem; color:var(--text-medium); margin-bottom: 20px;">
+        Choose a balanced alternative with similar macronutrients:
+      </p>
+
+      <div class="swap-options-list" id="swapOptionsList">
+        <!-- Swap options rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 6: DELETE CONFIRM MODAL ===== -->
+  <div class="modal" id="deleteMealModal">
+    <div class="modal-card">
+      <button class="modal-close" id="deleteMealCloseBtn">&times;</button>
+      <div style="font-size: 3rem; color: #EF4444; margin-bottom: 12px;"><i class="fa-solid fa-trash-can"></i></div>
+      <h3 style="font-size: 1.3rem; font-weight:800; color: var(--text-dark);">Remove Meal?</h3>
+      <p style="font-size: 0.9rem; color: var(--text-medium); margin: 10px 0 24px;">
+        Are you sure you want to remove <strong id="deleteMealNameText">this meal</strong> from your daily plan?
+      </p>
+      <div class="modal-footer-actions">
+        <button class="btn-danger" id="confirmDeleteMealBtn"><i class="fa-solid fa-trash-can"></i> Delete Meal</button>
+        <button class="btn-secondary" id="cancelDeleteMealBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 7: NUTRITION KNOWLEDGE MODAL ===== -->
+  <div class="modal" id="knowledgeModal">
+    <div class="modal-card large-modal">
+      <button class="modal-close" id="knowledgeCloseBtn">&times;</button>
+      <div class="knowledge-modal-header">
+        <div class="knowledge-emoji" id="knowledgeEmoji">🥦</div>
+        <div>
+          <span class="practice-subtag">NUTRITION SCIENCE</span>
+          <h2 id="knowledgeTitle">Vegetables & Super Nutrients</h2>
+        </div>
+      </div>
+
+      <div class="knowledge-body" id="knowledgeBody">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GROCERY TOAST NOTIFICATION ===== -->
+  <div class="grocery-toast" id="groceryToast">
+    <i class="fa-solid fa-cart-shopping"></i> Ingredients added to your grocery list!
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/nutrition.js"></script>
+</body>
+</html>
+</body>
+</html>

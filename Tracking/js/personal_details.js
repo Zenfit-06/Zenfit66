@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const fullName = user.fullName || user.name || "Akshay Kumar";
-    const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || "A";
+    const fullName = user.fullName || user.name || "User";
+    const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || "U";
 
     const initialsEl = document.getElementById("profileInitials");
     if (initialsEl) initialsEl.textContent = initials;

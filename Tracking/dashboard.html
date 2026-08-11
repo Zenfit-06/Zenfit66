@@ -1,545 +1,2442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ZENFIT Dashboard — Track your fitness progress, workouts, and health metrics.">
-  <title>ZENFIT — Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ZENFIT — Dashboard</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F0FAFB;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 188, 212, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(38, 198, 218, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 131, 143, 0.03) 0%, transparent 60%);
+            color: #0F172A;
+            min-height: 100vh;
+        }
+
+        body.sidebar-open {
+            overflow: hidden;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 270px;
+            height: 100vh;
+            background: white;
+            z-index: 10000;
+            padding: 25px 18px;
+            box-shadow: 8px 0 30px rgba(0,0,0,.08);
+
+            transform: translateX(-110%);
+            transition: transform .25s ease;
+
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 35px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .sidebar-brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #00838F, #00BCD4);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close {
+            width: 38px;
+            height: 38px;
+            border: 0;
+            border-radius: 10px;
+            background: #f1f5f8;
+            color: #34495e;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            width: 100%;
+            min-height: 48px;
+            border: 0;
+            background: transparent;
+            border-radius: 12px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: #60758b;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+            transition: .18s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #E0F7FA;
+            color: #00838F;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: #e8edf1;
+            margin: 20px 5px;
+        }
+
+        .logout-btn {
+            color: #ef4444;
+        }
+
+        .logout-btn:hover {
+            background: #fff0f0;
+            color: #dc2626;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(16,33,59,.45);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease;
+        }
+
+        .sidebar-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .top-header {
+            height: 108px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 35px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hamburger-btn {
+            width: 46px;
+            height: 46px;
+            border: 0;
+            border-radius: 15px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00838F;
+            box-shadow: 0 3px 12px rgba(0, 131, 143, 0.08);
+            font-size: 22px;
+        }
+
+        .hamburger-btn:hover {
+            background: #E0F7FA;
+        }
+
+        .greeting {
+            font-size: 23px;
+            font-weight: 700;
+            color: #10213b;
+        }
+
+        .greeting-sub {
+            margin-top: 5px;
+            color: #7890a9;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 19px;
+            margin-right: 8px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #00838F, #00BCD4);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 7px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #FF7043;
+        }
+
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00838F, #26C6DA);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .online-dot {
+            width: 9px;
+            height: 9px;
+            background: #25d37b;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .dashboard {
+            padding: 5px 34px 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 17px;
+        }
+
+        .bottom-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1.05fr 1.1fr 1.05fr;
+            gap: 17px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 131, 143, 0.06);
+            border: 1px solid rgba(0, 188, 212, 0.08);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.012);
+            box-shadow: 0 20px 42px rgba(0, 131, 143, 0.16);
+            border-color: rgba(0, 188, 212, 0.35);
+        }
+
+        .card .card-icon {
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.12) rotate(4deg);
+        }
+
+        .stat-card,
+        .fitness-card {
+            min-height: 168px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 23px;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .card-title {
+            color: #526a84;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .blue {
+            background: #E0F7FA;
+            color: #00838F;
+        }
+
+        .orange {
+            background: #FFF3E0;
+            color: #FF7043;
+        }
+
+        .cyan {
+            background: #E0F7FA;
+            color: #00BCD4;
+        }
+
+        .purple {
+            background: #E8F5E9;
+            color: #66BB6A;
+        }
+
+        .green {
+            background: #e5faef;
+            color: #16b86a;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 800;
+            color: #10213b;
+        }
+
+        .stat-value span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #7890a9;
+        }
+
+        .stat-goal {
+            color: #8295aa;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .progress-container {
+            height: 7px;
+            border-radius: 20px;
+            background: #edf2f6;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            width: var(--progress, 0%);
+            border-radius: inherit;
+            transition: width .35s ease;
+        }
+
+        .progress.blue {
+            background: #00838F;
+        }
+
+        .progress.orange {
+            background: #FF7043;
+        }
+
+        .progress.cyan {
+            background: #00BCD4;
+        }
+
+        .progress-label {
+            margin-top: 9px;
+            font-size: 12px;
+            color: #667d96;
+        }
+
+        /* =========================
+           FITNESS
+        ========================= */
+
+        .fitness-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fitness-score {
+            font-size: 31px;
+            font-weight: 800;
+        }
+
+        .fitness-score span {
+            font-size: 13px;
+            font-weight: 500;
+            color: #7c90a6;
+        }
+
+        .score-status {
+            margin-top: 7px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #18ae6c;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .score-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #19b878;
+        }
+
+        .score-ring {
+            width: 83px;
+            height: 83px;
+            border-radius: 50%;
+            background:
+                conic-gradient(
+                    #16b99a var(--score-degree, 0deg),
+                    #e6e9ed 0deg
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-ring::after {
+            content: "";
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* =========================
+           BODY STATS
+        ========================= */
+
+        .body-stats,
+        .heatmap-card,
+        .activity-card {
+            min-height: 316px;
+        }
+
+        .body-row {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 19px;
+        }
+
+        .body-icon {
+            width: 37px;
+            height: 37px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #edf8ff;
+            color: #10afd9;
+        }
+
+        .body-value {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .body-label {
+            font-size: 11px;
+            color: #7b91a8;
+            margin-top: 2px;
+        }
+
+        .details-btn {
+            width: 100%;
+            height: 34px;
+            border: 0;
+            background: #E0F7FA;
+            color: #00838F;
+            border-radius: 10px;
+            margin-top: 2px;
+            font-size: 12px;
+        }
+
+        /* =========================
+           HEATMAP
+        ========================= */
+
+        .see-all {
+            color: #00838F;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .month {
+            font-size: 14px;
+            color: #526a84;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 7px;
+            margin-top: 45px;
+        }
+
+        .heatmap-cell {
+            height: 20px;
+            border-radius: 4px;
+            background: #ebedf0;
+        }
+
+        .heatmap-cell[data-level="1"] {
+            background: #c6e48b;
+        }
+
+        .heatmap-cell[data-level="2"] {
+            background: #7bc96f;
+        }
+
+        .heatmap-cell[data-level="3"] {
+            background: #239a3b;
+        }
+
+        .heatmap-cell[data-level="4"] {
+            background: #196127;
+        }
+
+        .legend {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 7px;
+            font-size: 10px;
+            color: #71869b;
+        }
+
+        .legend-squares {
+            display: flex;
+            gap: 3px;
+        }
+
+        .legend-square {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .l0 { background:#ebedf0; }
+        .l1 { background:#c6e48b; }
+        .l2 { background:#7bc96f; }
+        .l3 { background:#239a3b; }
+        .l4 { background:#196127; }
+
+        /* =========================
+           ACTIVITY
+        ========================= */
+
+        .activity-map {
+            height: 118px;
+            border-radius: 13px;
+            background: linear-gradient(
+                135deg,
+                #e2f5ff,
+                #e9faee
+            );
+            margin-bottom: 17px;
+        }
+
+        .activity-title {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .activity-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .activity-time {
+            color: #7a90a5;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .activity-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin-top: 15px;
+        }
+
+        .activity-stat-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .activity-stat-label {
+            font-size: 10px;
+            color: #7c91a6;
+            margin-top: 2px;
+        }
+
+        .activity-badge {
+            display: inline-block;
+            background: #ddfae9;
+            color: #18aa68;
+            border-radius: 20px;
+            padding: 6px 13px;
+            font-size: 10px;
+            margin-top: 13px;
+        }
+
+        /* Bottom nav handled by external dashboard.css */
+
+        /* =========================
+           FLOATING BOTTOM TAB BAR (matches Health section)
+        ========================= */
+
+        .bottom-tabs {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            z-index: 90;
+            background: white;
+            border-radius: 30px;
+            padding: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 24px;
+            color: #64748B;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: #E0F7FA;
+            color: #00838F;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #00838F, #00BCD4);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 188, 212, 0.35);
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(20,30,42,.58);
+            backdrop-filter: blur(5px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .profile-modal {
+            width: 540px;
+            max-width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 25px 80px rgba(0,0,0,.22);
+        }
+
+        .modal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 27px;
+        }
+
+        .modal-heading {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #10213b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #10213b;
+        }
+
+        .modal-subtitle {
+            color: #7890a9;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .modal-close {
+            width: 38px;
+            height: 38px;
+            border: 0;
+            border-radius: 50%;
+            background: #f2f6f9;
+            color: #38516c;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #17304e;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #d9e2eb;
+            border-radius: 10px;
+            padding: 0 14px;
+            color: #162c46;
+            outline: none;
+            background: white;
+        }
+
+        .form-input:focus {
+            border-color: #00BCD4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.10);
+        }
+
+        .error-text {
+            min-height: 17px;
+            margin-top: 5px;
+            color: #ef4444;
+            font-size: 11px;
+        }
+
+        .password-section {
+            border-top: 1px solid #e3e8ed;
+            margin-top: 7px;
+            padding-top: 20px;
+        }
+
+        .password-heading {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 17px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 26px;
+        }
+
+        .btn {
+            min-width: 90px;
+            height: 48px;
+            border: 0;
+            border-radius: 11px;
+            padding: 0 20px;
+            font-weight: 700;
+        }
+
+        .btn-cancel {
+            background: #f1f5f8;
+            color: #243c57;
+        }
+
+        .btn-save {
+            background: #10213b;
+            color: white;
+        }
+
+        .save-message {
+            display: none;
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            background: #e4faee;
+            color: #148653;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .save-message.show {
+            display: block;
+        }
 
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/dashboard.css">
+/* SIDEBAR USER */
+
+.sidebar-user {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:25px;
+}
+
+
+.sidebar-avatar {
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background: linear-gradient(135deg, #00838F, #00BCD4);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+
+.sidebar-user strong {
+    display:block;
+    font-size:15px;
+}
+
+
+.sidebar-user small {
+    display:block;
+    color:#7890a9;
+    font-size:12px;
+}
+
+
+/* SIDEBAR BUTTON FIX */
+
+.sidebar-menu {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+
+.sidebar-item {
+    width:100%;
+    height:48px;
+    border:0;
+    background:transparent;
+    border-radius:12px;
+    padding:0 14px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:#60758b;
+    font-size:14px;
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+
+.sidebar-item:hover,
+.sidebar-item.active {
+
+    background:#E0F7FA;
+    color:#00838F;
+
+}
+
+
+.sidebar-footer {
+    margin-top:30px;
+}
+
+
+
+.heatmap-summary{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    margin-top:25px;
+}
+
+
+.heat-stat{
+    flex:1;
+    background:#f7fbff;
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+
+.heat-stat span{
+    font-size:24px;
+}
+
+
+.heat-stat strong{
+    display:block;
+    font-size:18px;
+    color:#16345c;
+}
+
+
+.heat-stat small{
+    color:#6d88aa;
+    font-size:12px;
+}
+
+
+
+/* heat cells */
+
+#heatmap{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:8px;
+    margin-top:25px;
+}
+
+
+.heat-cell{
+    height:22px;
+    border-radius:6px;
+    background:#edf2f5;
+    cursor:pointer;
+    transition:.2s;
+}
+
+
+.heat-cell:hover{
+    transform:scale(1.15);
+}
+
+        /* =========================
+           FLOATING BOTTOM NAVIGATION
+        ========================= */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 6px;
+            border-radius: 40px;
+            box-shadow: 0 12px 32px rgba(0, 131, 143, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            z-index: 1000;
+            gap: 4px;
+        }
+
+        .bottom-tabs .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: none;
+            background: transparent;
+            color: #64748B;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .bottom-tabs .tab:hover {
+            background: #E0F7FA;
+            color: #00838F;
+        }
+
+        .bottom-tabs .tab.active {
+            background: linear-gradient(135deg, #00838F, #00BCD4);
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width:1050px) {
+            .stats-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width:650px) {
+            .top-header {
+                height: auto;
+                padding: 18px;
+            }
+
+            .dashboard {
+                padding: 5px 15px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-right {
+                gap: 8px;
+            }
+
+            .brand {
+                display: none;
+            }
+
+            .greeting {
+                font-size: 17px;
+            }
+
+            .greeting-sub {
+                font-size: 11px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .profile-modal {
+                padding: 22px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- ===== SIDEBAR (Always Visible) ===== -->
-<aside class="sidebar" id="sidebar">
-  <!-- Brand Logo at Top of Sidebar -->
-  <!-- <div class="sidebar-brand">
-    <div class="sidebar-brand-group">
-      <div class="sidebar-logo-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-      </div>
-      <span class="sidebar-logo-text">ZENFIT</span>
-    </div>
-    <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-  </div> -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-  <!-- Navigation -->
-  <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" id="nav-dashboard">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-      </svg>
-      <span>Dashboard</span>
-    </a>
-    <!-- <a href="#" class="nav-item" id="nav-activities">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-      </svg>
-      <span>Activities</span>
-    </a>
-    <a href="#" class="nav-item" id="nav-analytics">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10"></line>
-        <line x1="12" y1="20" x2="12" y2="4"></line>
-        <line x1="6" y1="20" x2="6" y2="14"></line>
-      </svg>
-      <span>Analytics</span>
-    </a> -->
-    <!-- <a href="#" class="nav-item" id="nav-workouts">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6.5 6.5h11"></path>
-        <path d="M6.5 17.5h11"></path>
-        <rect x="2" y="11" width="20" height="2" rx="1"></rect>
-        <rect x="4" y="8" width="2" height="8" rx="1"></rect>
-        <rect x="18" y="8" width="2" height="8" rx="1"></rect>
-      </svg>
-      <span>Workouts</span>
-    </a> -->
-    <a href="#" class="nav-item" id="nav-routes">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-        <line x1="8" y1="2" x2="8" y2="18"></line>
-      </svg>
-      <span>Routes</span>
-    </a>
+    <header class="top-header">
 
-<a href="personal_details.html" class="nav-item" id="nav-personal-details">
+        <div class="header-left">
 
-    <svg xmlns="http://www.w3.org/2000/svg"
-         width="18"
-         height="18"
-         viewBox="0 0 24 24"
-         fill="none"
-         stroke="currentColor"
-         stroke-width="2"
-         stroke-linecap="round"
-         stroke-linejoin="round">
+            <button
+class="hamburger-btn"
+id="hamburgerBtn"
+type="button">
+☰
+</button>
 
-        <path d="M20 21a8 8 0 0 0-16 0"/>
-        <circle cx="12" cy="7" r="4"/>
+            <div>
+               <h1 class="greeting" id="greeting">
+    Good Morning, <span id="userName">User</span> ! 👋
+</h1>
 
-    </svg>
+                <p class="greeting-sub">
+                    Here's your fitness overview
+                </p>
+            </div>
 
-    <span>Personal Details</span>
+        </div>
 
+
+        <div class="header-right">
+
+            <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 10px;">
+                <div class="sidebar-logo-icon" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00838F, #00BCD4); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <span style="font-size: 1.3rem; font-weight: 800; color: #0F172A; letter-spacing: -0.03em;">ZENFIT</span>
+            </div>
+
+            <button
+                class="header-icon-btn"
+                id="notifBtn"
+                type="button"
+                aria-label="Notifications"
+            >
+                ♧
+                <span class="notif-dot"></span>
+            </button>
+
+            <div
+                class="header-avatar"
+                id="headerAvatar"
+                role="button"
+                tabindex="0"
+                title="Personal Details"
+                onclick="window.location.href='personal_details.html'"
+                style="cursor: pointer;"
+            >
+                <span id="headerAvatarText">U</span>
+                <span class="online-dot"></span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN DASHBOARD
+    ====================================================== -->
+
+    <main class="dashboard">
+
+
+        <!-- ================= TOP STATS ================= -->
+
+        <section class="stats-grid">
+
+
+            <!-- Fitness Score -->
+
+            <div class="card fitness-card">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        Fitness Score
+                    </span>
+
+                    <span>ⓘ</span>
+
+                </div>
+
+
+                <div class="fitness-content">
+
+                    <div>
+
+                        <div class="fitness-score">
+                            <span id="fitnessScore">0</span>
+                            <span>/100</span>
+                        </div>
+
+
+                        <div class="score-status">
+
+                            <span class="score-dot"></span>
+
+                            <span id="scoreLabel">
+                                No Activity Yet
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="score-ring"
+                        id="scoreRing"
+                        style="--score-degree:0deg"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Distance -->
+
+            <div class="card stat-card">
+
+                <div class="card-header">
+
+                    <div class="card-header-left">
+
+                        <div class="card-icon blue">
+                            ↗
+                        </div>
+
+                        <span class="card-title">
+                            Distance
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-value">
+
+                    <span id="distanceTopValue">
+                        0.0
+                    </span>
+
+                    <span>km</span>
+
+                </div>
+
+
+                <div class="stat-goal">
+                    /5 km
+                </div>
+
+
+                <div class="progress-container">
+
+                    <div
+                        class="progress blue"
+                        id="distanceProgressBar"
+                        style="--progress:0%"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="progress-label"
+                    id="distanceProgressLabel"
+                >
+                    0% of your goal
+                </div>
+
+            </div>
+
+
+            <!-- Daily Calories -->
+
+            <div class="card stat-card">
+
+                <div class="card-header">
+
+                    <div class="card-header-left">
+
+                        <div class="card-icon orange">
+                            🔥
+                        </div>
+
+                        <span class="card-title">
+                            Daily Calorie Need
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-value">
+
+                    <span id="calorieNeedValue">
+                        0
+                    </span>
+
+                    <span>kcal</span>
+
+                </div>
+
+
+                <div class="stat-goal">
+                    Estimated from profile
+                </div>
+
+
+                <div class="progress-container">
+
+                    <div
+                        class="progress orange"
+                        id="calorieNeedProgressBar"
+                        style="--progress:0%"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="progress-label"
+                    id="calorieNeedProgressLabel"
+                >
+                    Complete profile to calculate
+                </div>
+
+            </div>
+
+
+            <!-- Workout -->
+
+            <div class="card stat-card">
+
+                <div class="card-header">
+
+                    <div class="card-header-left">
+
+                        <div class="card-icon cyan">
+                            🏋
+                        </div>
+
+                        <span class="card-title">
+                            Workout Sessions
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-value">
+
+                    <span id="workoutSessionsValue">
+                        0
+                    </span>
+
+                </div>
+
+
+                <div class="stat-goal">
+                    /5 this week
+                </div>
+
+
+                <div class="progress-container">
+
+                    <div
+                        class="progress cyan"
+                        id="workoutSessionsProgressBar"
+                        style="--progress:0%"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="progress-label"
+                    id="workoutSessionsProgressLabel"
+                >
+                    0% of your goal
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= BOTTOM GRID ================= -->
+
+        <section class="bottom-grid">
+
+
+            <!-- BODY STATS -->
+
+            <div class="card body-stats" onclick="window.location.href='health.html'" style="cursor: pointer;">
+
+                <div class="card-header">
+
+                    <span class="card-title">
+                        Body Stats & Health
+                    </span>
+
+                    <span>›</span>
+
+                </div>
+
+
+                <div class="body-row">
+
+                    <div class="body-icon">
+                        ◷
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="body-value"
+                            id="bmiValue"
+                        >
+                            --
+                        </div>
+
+                        <div class="body-label">
+                            BMI
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="body-row">
+
+                    <div class="body-icon">
+                        ↕
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="body-value"
+                            id="heightValue"
+                        >
+                            --
+                        </div>
+
+                        <div class="body-label">
+                            Height
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="body-row">
+
+                    <div class="body-icon">
+                        +
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="body-value"
+                            id="weightValue"
+                        >
+                            --
+                        </div>
+
+                        <div class="body-label">
+                            Weight
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="body-row">
+
+                    <div class="body-icon">
+                        ◷
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="body-value"
+                            id="bmrValue"
+                        >
+                            --
+                        </div>
+
+                        <div class="body-label">
+                            BMR
+                        </div>
+
+                        <div class="body-row">
+
+<div class="body-icon">
+🎯
+</div>
+
+<div>
+
+<div
+class="body-value"
+id="goalValue">
+--
+</div>
+
+<div class="body-label">
+Goal
+</div>
+
+</div>
+
+</div>
+
+                    </div>
+
+                </div>
+
+
+               <a 
+href="body_stats.html"
+class="details-btn"
+id="bodyDetailsBtn"
+>
+View Details →
 </a>
 
+            </div>
 
 
 
-    <a href="#" class="nav-item" id="nav-goals">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <circle cx="12" cy="12" r="6"></circle>
-        <circle cx="12" cy="12" r="2"></circle>
-      </svg>
-      <span>Goals</span>
-    </a>
-    <a href="#" class="nav-item" id="nav-aicoach">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-      </svg>
-      <span>AI Coach</span>
-    </a>
-    <a href="#" class="nav-item" id="nav-settings">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-2.82.33 1.65 1.65 0 0 0-.1 1.51 2 2 0 0 1-1.4 2.65 2 2 0 0 1-2.5-1.4 1.65 1.65 0 0 0-1.51-.1 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-2.82 1.65 1.65 0 0 0-1.51-.1 2 2 0 0 1-2.65-1.4 2 2 0 0 1 1.4-2.5 1.65 1.65 0 0 0 .1-1.51 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 2.82-.33 1.65 1.65 0 0 0 .1-1.51 2 2 0 0 1 1.4-2.65 2 2 0 0 1 2.5 1.4 1.65 1.65 0 0 0 1.51.1 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 2.82 1.65 1.65 0 0 0 1.51.1 2 2 0 0 1 2.65 1.4 2 2 0 0 1-1.4 2.5 1.65 1.65 0 0 0-.1 1.51z"></path>
-      </svg>
-      <span>Settings</span>
-    </a>
-  </nav>
+            <!-- HEATMAP -->
 
-  <!-- User Profile Section (in lower sidebar area) -->
-  <div class="sidebar-profile-lower">
-    <div class="profile-avatar" id="userAvatar">AK</div>
-    <div class="profile-details">
-      <span class="profile-name" id="userName">Akshay Kumar</span>
-      <span class="profile-badge">👑 Pro Member 👋</span>
-    </div>
-  </div>
+            <div class="card heatmap-card">
 
-  <!-- Weekly Progress Card -->
-  <div class="sidebar-weekly">
-    <div class="weekly-stats">
-      <div class="weekly-stat">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-        </svg>
+                <div class="card-header">
+
+                    <div class="card-header-left">
+
+                        <span>▣</span>
+
+                        <span class="card-title">
+                            Activity Heatmap
+                        </span>
+
+                    </div>
+
+                    <div class="heatmap-summary">
+
+    <div class="heat-stat">
+        <span>🔥</span>
         <div>
-          <div class="weekly-stat-label">Streak</div>
-          <div class="weekly-stat-value">7 Days</div>
+            <strong id="heatWorkoutDays">0</strong>
+            <small>Workout Days</small>
         </div>
-      </div>
-      <div class="weekly-stat">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-          <polyline points="17 6 23 6 23 12"></polyline>
-        </svg>
+    </div>
+
+
+    <div class="heat-stat">
+        <span>📏</span>
         <div>
-          <div class="weekly-stat-label">Level</div>
-          <div class="weekly-stat-value">12</div>
+            <strong id="heatDistance">0 km</strong>
+            <small>Total Distance</small>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Log Out -->
-  <button class="logout-btn" id="logoutBtn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-      <polyline points="16 17 21 12 16 7"></polyline>
-      <line x1="21" y1="12" x2="9" y2="12"></line>
-    </svg>
-    <span>Log Out</span>
-  </button>
-</aside>
-
-<!-- ===== MAIN CONTENT ===== -->
-<main class="main-content" id="mainContent">
-  <!-- Header -->
-  <header class="dashboard-header">
-
-    <div class="header-left">
-      <!-- Hamburger Menu (mobile) -->
-      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle sidebar">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-      <div>
-        <h1 class="greeting" id="greeting">Good Morning, Akshay! 👋</h1>
-        <p class="greeting-sub">Here's your fitness overview</p>
-      </div>
-    </div>
-
-    <div class="header-right">
-
-       <div class="sidebar-brand">
-    <div class="sidebar-brand-group">
-      <div class="sidebar-logo-icon">
-        <svg xmlns="logo.svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-      </div>
-      <span class="sidebar-logo-text">ZENFIT</span>
-    </div>
-    <!-- <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button> -->
-  </div>
-
-
-
-
-      <!-- Notification bell -->
-      <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
-        <span class="notif-dot"></span>
-      </button>
-      <!-- User avatar -->
-      <div class="header-avatar" id="headerAvatar">
-        <span id="headerAvatarText">AK</span>
-        <span class="online-dot"></span>
-      </div>
     </div>
 
 
-  </header>
-
-  <!-- Stats Cards Row -->
-  <section class="stats-grid">
-    <!-- Fitness Score Card -->
-    <div class="stat-card fitness-score-card">
-      <div class="card-header">
-        <span class="card-title">Fitness Score</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-      </div>
-      <div class="fitness-score-content">
-        <div class="score-left">
-          <div class="score-number">
-            <span class="score-value">92</span>
-            <span class="score-max">/100</span>
-          </div>
-          <div class="score-label">
-            <span class="dot green"></span>
-            <span>Excellent</span>
-          </div>
+    <div class="heat-stat">
+        <span>⚡</span>
+        <div>
+            <strong id="heatCalories">0</strong>
+            <small>Calories</small>
         </div>
-        <div class="score-right">
-          <svg class="progress-ring" width="80" height="80" viewBox="0 0 80 80">
-            <circle class="ring-bg" cx="40" cy="40" r="34" fill="none" stroke="#e5e7eb" stroke-width="8" />
-            <circle class="ring-progress" cx="40" cy="40" r="34" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="17.088" transform="rotate(-90 40 40)" />
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#10b981" />
-                <stop offset="100%" stop-color="#06b6d4" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
-      <div class="sparkline" id="sparkline"></div>
     </div>
 
-    <!-- Steps Card -->
-    <div class="stat-card">
-      <div class="card-header">
-        <div class="card-icon blue">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 16v-2.38C4 11.5 5.5 10 7.38 10h1.24c1.88 0 3.38 1.5 3.38 3.62V16"></path>
-            <path d="M12 13.5v-2.12a3.38 3.38 0 0 1 3.38-3.38h1.24A3.38 3.38 0 0 1 20 11.38V16"></path>
-            <path d="M4 16h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2z"></path>
-          </svg>
-        </div>
-        <span class="card-title">Steps</span>
-      </div>
-      <div class="stat-value-large">8,423</div>
-      <div class="stat-goal">/10,000</div>
-      <div class="progress-bar-container">
-        <div class="progress-bar blue" style="--progress: 84%"></div>
-      </div>
-      <div class="progress-label">84% of your goal</div>
-    </div>
+</div>
 
-    <!-- Calories Card -->
-    <div class="stat-card">
-      <div class="card-header">
-        <div class="card-icon orange">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-          </svg>
-        </div>
-        <span class="card-title">Calories</span>
-      </div>
-      <div class="stat-value-large">612 <span class="stat-unit">kcal</span></div>
-      <div class="progress-bar-container">
-        <div class="progress-bar orange" style="--progress: 62%"></div>
-      </div>
-      <div class="progress-label">62% of your goal</div>
-    </div>
 
-    <!-- Active Time Card -->
-    <div class="stat-card">
-      <div class="card-header">
-        <div class="card-icon cyan">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-        <span class="card-title">Active Time</span>
-      </div>
-      <div class="stat-value-large">1h 32m</div>
-      <div class="stat-goal">/2h 0m</div>
-      <div class="progress-bar-container">
-        <div class="progress-bar cyan" style="--progress: 77%"></div>
-      </div>
-      <div class="progress-label">77% of your goal</div>
-    </div>
-  </section>
+                    <a
+                        href="athletes.html"
+                        class="see-all"
+                    >
+                        See All →
+                    </a>
 
-  <!-- Bottom Section — 3 Cards -->
-  <section class="bottom-grid">
-    <!-- Today's Summary -->
-    <div class="stat-card summary-card">
-      <div class="card-header">
-        <span class="card-title">Today's Summary</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </div>
-      <div class="summary-list">
-        <div class="summary-item">
-          <div class="summary-icon teal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-              <line x1="8" y1="2" x2="8" y2="18"></line>
-              <line x1="16" y1="6" x2="16" y2="22"></line>
+                </div>
+
+
+                <div
+                    class="month"
+                    id="heatmapMonth"
+                >
+                    August 2026
+                </div>
+
+
+                <div
+                    class="heatmap"
+                    id="heatmap"
+                ></div>
+
+
+                <div class="legend">
+
+                    <span>Less</span>
+
+                    <div class="legend-squares">
+
+                        <span class="legend-square l0"></span>
+                        <span class="legend-square l1"></span>
+                        <span class="legend-square l2"></span>
+                        <span class="legend-square l3"></span>
+                        <span class="legend-square l4"></span>
+
+                    </div>
+
+                    <span>More</span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- LATEST ACTIVITY -->
+
+            <div class="card activity-card">
+
+                <div class="card-header">
+
+                    <div class="card-header-left">
+
+                        <span>🏃</span>
+
+                        <span class="card-title">
+                            Latest Activity
+                        </span>
+
+                    </div>
+
+
+                    <a
+                        href="gps.html"
+                        class="see-all"
+                    >
+                        GPS Tracker →
+                    </a>
+
+                </div>
+
+
+                <div
+                    class="activity-map"
+                    id="activityMap"
+                    title="Click map for GPS Tracking details"
+                >
+                    <div class="map-hover-hint">📍 Click map for GPS Tracker ↗</div>
+                </div>
+
+
+                <div class="activity-title">
+
+                    <span style="font-size:22px;">
+                        🏃
+                    </span>
+
+                    <div>
+
+                        <div
+                            class="activity-name"
+                            id="activityName"
+                        >
+                            No activity yet
+                        </div>
+
+                        <div
+                            class="activity-time"
+                            id="activityTime"
+                        >
+                            Start a workout to see your latest activity
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="activity-stats">
+
+                    <div>
+
+                        <div
+                            class="activity-stat-value"
+                            id="activityDistance"
+                        >
+                            0 km
+                        </div>
+
+                        <div class="activity-stat-label">
+                            Distance
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            class="activity-stat-value"
+                            id="activityDuration"
+                        >
+                            00:00
+                        </div>
+
+                        <div class="activity-stat-label">
+                            Duration
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            class="activity-stat-value"
+                            id="activityCalories"
+                        >
+                            0
+                        </div>
+
+                        <div class="activity-stat-label">
+                            kcal
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="activity-badge"
+                    id="activityBadge"
+                >
+                    No activity yet
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= BOTTOM NAV ================= -->
+
+        <div class="bottom-tabs">
+          <button class="tab active" id="tab-daily" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
-          </div>
-          <div>
-            <div class="summary-value">6.8 km</div>
-            <div class="summary-label">Distance</div>
-          </div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-icon red">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span>Daily</span>
+          </button>
+
+          <button class="tab" id="tab-health" type="button" onclick="window.location.href='health.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
-          </div>
-          <div>
-            <div class="summary-value">128 bpm</div>
-            <div class="summary-label">Avg. Heart Rate</div>
-          </div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-icon purple">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+            <span>Health</span>
+          </button>
+
+          <button class="tab" id="tab-athletes" type="button" onclick="window.location.href='athletes.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-          </div>
-          <div>
-            <div class="summary-value">7'42"</div>
-            <div class="summary-label">Avg. Pace</div>
-          </div>
+            <span>Athletes</span>
+          </button>
         </div>
-        <div class="summary-item">
-          <div class="summary-icon orange">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-            </svg>
-          </div>
-          <div>
-            <div class="summary-value">612 kcal</div>
-            <div class="summary-label">Calories Burned</div>
-          </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+   <div
+    class="sidebar-backdrop"
+    id="sidebarOverlay"
+></div>
+
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="sidebar-header">
+
+            <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 10px;">
+                <div class="sidebar-logo-icon" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00838F, #00BCD4); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <span style="font-size: 1.3rem; font-weight: 800; color: #0F172A; letter-spacing: -0.03em;">ZENFIT</span>
+            </div>
+
+
+            <button
+                class="sidebar-close"
+                id="sidebarClose"
+                type="button"
+            >
+                ✕
+            </button>
+
         </div>
-      </div>
-      <a href="#" class="view-details">View Details &rarr;</a>
-    </div>
 
-    <!-- Activity Heatmap -->
-    <div class="stat-card heatmap-card">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;gap:8px">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span class="card-title">Activity Heatmap</span>
+
+        <div class="sidebar-user">
+
+            <div
+                class="sidebar-avatar"
+                id="sidebarAvatar"
+            >
+                U
+            </div>
+
+
+            <div>
+                <strong id="sidebarUserName" style="display: block; font-size: 0.95rem; font-weight: 700; color: #0F172A;">
+                    User
+                </strong>
+                <small id="sidebarUserBadge" style="color: #FF7043; font-weight: 600; font-size: 0.82rem; display: block; margin-top: 2px;">
+                    👑 Pro Member 👋
+                </small>
+            </div>
+
         </div>
-        <a href="#" class="see-all" id="heatmapSeeAll">See All &rarr;</a>
-      </div>
-      <div class="heatmap-month-row">
-        <span class="heatmap-month" id="heatmapMonth">August 2026</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heatmap-chevron">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-      <div class="heatmap-container" id="heatmap">
-        <!-- Generated by JS -->
-      </div>
-      <div class="heatmap-legend">
-        <span>Less</span>
-        <div class="legend-squares">
-          <div style="width:9px;height:9px;background:#ebedf0;border-radius:2px;"></div>
-          <div style="width:9px;height:9px;background:#c6e48b;border-radius:2px;"></div>
-          <div style="width:9px;height:9px;background:#7bc96f;border-radius:2px;"></div>
-          <div style="width:9px;height:9px;background:#239a3b;border-radius:2px;"></div>
-          <div style="width:9px;height:9px;background:#196127;border-radius:2px;"></div>
+
+
+        <nav class="sidebar-menu">
+
+            <button
+                class="sidebar-item active"
+                id="menuDashboard"
+                type="button"
+            >
+                🏠
+                <span>Dashboard</span>
+            </button>
+
+
+            <button
+                class="sidebar-item"
+                id="menuProfile"
+                type="button"
+            >
+                👤
+                <span>Profile</span>
+            </button>
+
+
+            <button
+                class="sidebar-item"
+                id="menuHealth"
+                type="button"
+            >
+                ❤️
+                <span>Health</span>
+            </button>
+
+
+            <button
+                class="sidebar-item"
+                id="menuGPS"
+                type="button"
+                onclick="window.location.href='gps.html'"
+            >
+                📍
+                <span>GPS Tracking</span>
+            </button>
+
+
+            <button
+                class="sidebar-item"
+                id="menuNutrition"
+                type="button"
+            >
+                🥗
+                <span>Nutrition</span>
+            </button>
+
+
+            <button
+    class="sidebar-item"
+    id="menuWorkout"
+    type="button"
+>
+    🏋
+    <span>Workout</span>
+</button>
+
+
+
+
+            <button
+                class="sidebar-item"
+                id="menuAthletes"
+                type="button"
+            >
+                🏃
+                <span>Athletes</span>
+            </button>
+
+
+            <button
+                class="sidebar-item"
+                id="menuNotifications"
+                type="button"
+            >
+                🔔
+                <span>Notifications</span>
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <button
+                class="sidebar-item"
+                id="menuReset"
+                type="button"
+            >
+                ↻
+                <span>Reset Dashboard</span>
+            </button>
+
         </div>
-        <span>More</span>
-      </div>
-    </div>
 
-    <!-- Latest Activity -->
-    <div class="stat-card activity-card">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;gap:8px">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-            <path d="M15.5 12h-3v4.5L16 22"></path>
-            <path d="M12.5 16.5 10 22"></path>
-            <path d="M10.5 7.5 12.5 12H16"></path>
-            <path d="m8.5 10-3.5 1.5"></path>
-          </svg>
-          <span class="card-title">Latest Activity</span>
-        </div>
-        <a href="#" class="see-all">See All &rarr;</a>
-      </div>
-      <div class="activity-map" id="activityMap">
-        <!-- SVG route map -->
-      </div>
-      <div class="activity-info">
-        <div class="activity-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-            <path d="M15.5 12h-3v4.5L16 22"></path>
-            <path d="M12.5 16.5 10 22"></path>
-            <path d="M10.5 7.5 12.5 12H16"></path>
-            <path d="m8.5 10-3.5 1.5"></path>
-          </svg>
-          <div>
-            <div class="activity-name">Morning Run</div>
-            <div class="activity-time">Today, 7:15 AM</div>
-          </div>
-        </div>
-        <div class="activity-stats">
-          <div>
-            <div class="activity-stat-value">6.8 km</div>
-            <div class="activity-stat-label">Distance</div>
-          </div>
-          <div>
-            <div class="activity-stat-value">52:18</div>
-            <div class="activity-stat-label">Duration</div>
-          </div>
-          <div>
-            <div class="activity-stat-value">612</div>
-            <div class="activity-stat-label">kcal</div>
-          </div>
-        </div>
-        <div class="activity-badge">🏃 Great Pace!</div>
-      </div>
-    </div>
-  </section>
+<button
+class="sidebar-item logout-btn"
+id="menuLogout"
+type="button">
 
-  <!-- Bottom Tab Bar -->
-  <div class="bottom-tabs">
-    <button class="tab active" id="tab-daily">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-      </svg>
-      <span>Daily</span>
-    </button>
-    <button class="tab" id="tab-health">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-      </svg>
-      <span>Health</span>
-    </button>
-    <button class="tab" id="tab-athletes">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
-      <span>Athletes</span>
-    </button>
-  </div>
-</main>
+🚪
+<span>Logout</span>
 
-<!-- Mobile sidebar backdrop -->
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+</button>
 
 
-<!-- Basic Information Modal -->
- <div id="profileModal" class="modal">
-   <div class="modal-content">
+    </aside>
 
-    <h2>Complete Your Profile</h2>
 
-   <input type="number" id="age" placeholder="Age" min="1" max="120" step="1" onkeydown="if(['-','+','e','E'].includes(event.key)) event.preventDefault();" oninput="if(this.value < 0) this.value = Math.abs(this.value);">
-<span class="error" id="ageError"></span>
+    <div 
+    id="sidebarOverlay"
+    class="sidebar-backdrop">
+</div>
 
-<select id="gender">
-    <option value="">Select Gender</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-    <option value="Other">Other</option>
+
+
+    <!-- =====================================================
+         PROFILE MODAL
+    ====================================================== -->
+
+    <div
+        class="modal-overlay"
+        id="profileModalOverlay"
+    >
+
+        <div
+            class="profile-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profileModalTitle"
+        >
+
+            <div class="modal-top">
+
+                <div class="modal-heading">
+
+                    <div
+                        class="modal-avatar"
+                        id="modalAvatar"
+                    >
+                        U
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            class="modal-title"
+                            id="profileModalTitle"
+                        >
+                            Edit Profile
+                        </div>
+
+                        <div class="modal-subtitle">
+                            Update your account information
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="modal-close"
+                    id="closeProfileModal"
+                    type="button"
+                    aria-label="Close"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+
+            <!-- FULL NAME -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="editFullName"
+                >
+                    Full Name
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    id="editFullName"
+                    autocomplete="name"
+                    placeholder="Enter your full name"
+                >
+
+                <div
+                    class="error-text"
+                    id="nameError"
+                ></div>
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="editEmail"
+                >
+                    Email
+                </label>
+
+                <input
+                    class="form-input"
+                    type="email"
+                    id="editEmail"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                >
+
+                <div
+                    class="error-text"
+                    id="emailError"
+                ></div>
+
+            </div>
+
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="editPhone"
+                >
+                    Phone Number
+                </label>
+
+                <input
+                    class="form-input"
+                    type="tel"
+                    id="editPhone"
+                    autocomplete="tel"
+                    placeholder="Enter phone number"
+                >
+
+                <div
+                    class="error-text"
+                    id="phoneError"
+                ></div>
+
+            </div>
+
+
+            <div class="form-group">
+
+<label class="form-label">
+Age
+</label>
+
+<input
+class="form-input"
+type="number"
+id="editAge"
+min="1"
+max="120"
+step="1"
+onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+placeholder="Enter age">
+
+<div class="error-text" id="ageError"></div>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="form-label">
+Gender
+</label>
+
+<select
+class="form-input"
+id="editGender">
+
+<option value="">
+Select Gender
+</option>
+
+<option value="Male">
+Male
+</option>
+
+<option value="Female">
+Female
+</option>
+
 </select>
-<span class="error" id="genderError"></span>
-
-<input type="number" id="height" placeholder="Height (cm)" min="50" max="300" step="0.1" onkeydown="if(['-','+','e','E'].includes(event.key)) event.preventDefault();" oninput="if(this.value < 0) this.value = Math.abs(this.value);">
-<span class="error" id="heightError"></span>
-
-<input type="number" id="weight" placeholder="Weight (kg)" min="10" max="500" step="0.1" onkeydown="if(['-','+','e','E'].includes(event.key)) event.preventDefault();" oninput="if(this.value < 0) this.value = Math.abs(this.value);">
-<span class="error" id="weightError"></span>
-
-<button id="saveProfile">Save & Continue</button>
 
 </div>
+
+
+<div class="form-group">
+
+<label class="form-label">
+Height (cm)
+</label>
+
+<input
+class="form-input"
+type="number"
+id="editHeight"
+min="1"
+max="300"
+step="0.1"
+onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+placeholder="175">
+
+<div class="error-text" id="heightError"></div>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="form-label">
+Weight (kg)
+</label>
+
+<input
+class="form-input"
+type="number"
+id="editWeight"
+min="1"
+max="500"
+step="0.1"
+onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+placeholder="70">
+
+<div class="error-text" id="weightError"></div>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="form-label">
+Fitness Goal
+</label>
+
+<select
+class="form-input"
+id="editGoal">
+
+<option value="">
+Select Goal
+</option>
+
+<option>
+Weight Loss
+</option>
+
+<option>
+Muscle Gain
+</option>
+
+<option>
+Maintain Fitness
+</option>
+
+</select>
+
 </div>
 
 
 
-<script src="js/dashboard.js"></script>
+            <!-- PASSWORD -->
+
+            <div class="password-section">
+
+                <div class="password-heading">
+                    Change Password
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="editPassword"
+                    >
+                        New Password
+                    </label>
+
+                    <input
+                        class="form-input"
+                        type="password"
+                        id="editPassword"
+                        autocomplete="new-password"
+                        placeholder="Leave blank to keep current password"
+                    >
+
+                    <div
+                        class="error-text"
+                        id="passwordError"
+                    ></div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="editConfirmPassword"
+                    >
+                        Confirm New Password
+                    </label>
+
+                    <input
+                        class="form-input"
+                        type="password"
+                        id="editConfirmPassword"
+                        autocomplete="new-password"
+                        placeholder="Confirm new password"
+                    >
+
+                    <div
+                        class="error-text"
+                        id="confirmPasswordError"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <div
+                class="save-message"
+                id="saveMessage"
+            >
+                Profile updated successfully.
+            </div>
+
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="btn btn-cancel"
+                    id="cancelProfile"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="btn btn-save"
+                    id="saveProfileChanges"
+                    type="button"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Floating Bottom Navigation Bar -->
+    <div class="bottom-tabs">
+      <button class="tab active" id="tab-daily" onclick="window.location.href='dashboard.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span>Daily</span>
+      </button>
+      <button class="tab" id="tab-health" onclick="window.location.href='health.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>Health</span>
+      </button>
+      <button class="tab" id="tab-athletes" onclick="window.location.href='athletes.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>Athletes</span>
+      </button>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/dashboard.js"></script>
+
 </body>
+
+
 </html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>ZENFIT — Workout</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial;
+}
+
+body{
+background:#eaf5fc;
+color:#10213b;
+}
+
+
+.container{
+
+max-width:500px;
+margin:50px auto;
+padding:20px;
+
+}
+
+
+.card{
+
+background:white;
+border-radius:20px;
+padding:30px;
+
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+}
+
+
+h1{
+
+font-size:26px;
+margin-bottom:20px;
+
+}
+
+
+label{
+
+display:block;
+font-size:14px;
+font-weight:700;
+margin-top:18px;
+
+}
+
+
+input,
+select{
+
+width:100%;
+height:48px;
+border:1px solid #ddd;
+border-radius:12px;
+padding:0 15px;
+margin-top:8px;
+
+}
+
+
+button{
+
+margin-top:25px;
+width:100%;
+height:50px;
+border:0;
+border-radius:14px;
+
+background:#10213b;
+color:white;
+
+font-weight:700;
+font-size:16px;
+
+}
+
+
+.back{
+
+display:block;
+margin-top:15px;
+text-align:center;
+color:#1599e3;
+text-decoration:none;
+
+}
+
+
+.success{
+
+margin-top:15px;
+padding:12px;
+border-radius:10px;
+
+background:#e4faee;
+color:#148653;
+
+display:none;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h1>
+🏋 Add Workout
+</h1>
+
+
+<label>
+Exercise
+</label>
+
+
+<select id="exercise">
+
+<option value="Running">
+🏃 Running
+</option>
+
+
+<option value="Cycling">
+🚴 Cycling
+</option>
+
+
+<option value="Weight Training">
+🏋 Weight Training
+</option>
+
+
+<option value="Yoga">
+🧘 Yoga
+</option>
+
+
+<option value="HIIT">
+🔥 HIIT
+</option>
+
+
+</select>
+
+
+
+<label>
+Duration (minutes)
+</label>
+
+
+<input 
+type="number"
+id="duration"
+min="0"
+onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+placeholder="30"
+>
+
+
+
+<label>
+Distance (km)
+</label>
+
+
+<input
+type="number"
+id="distance"
+min="0"
+onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+placeholder="5"
+>
+
+
+
+<button id="saveWorkout">
+
+Save Workout
+
+</button>
+
+
+<div 
+class="success"
+id="success"
+>
+Workout Added Successfully ✅
+</div>
+
+
+<a 
+href="dashboard.html"
+class="back"
+>
+← Back Dashboard
+</a>
+
+
+</div>
+
+
+</div>
+
+
+<script src="js/workout.js"></script>
+
+
+</body>
+</html>

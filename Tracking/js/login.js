@@ -252,6 +252,17 @@ async function handleLogin(event) {
 
     // Save active session in localStorage
     localStorage.setItem('zenfit_user', JSON.stringify(matched));
+    localStorage.setItem('zenfitProfile', JSON.stringify({
+        name: matched.fullName || matched.name || "User",
+        email: matched.email || "",
+        gender: matched.gender || "Male",
+        age: matched.age || "25",
+        height: matched.height || "175",
+        weight: matched.weight || "70",
+        goal: matched.fitnessGoal || matched.goal || "Maintain Fitness",
+        bmi: matched.bmi || "22.9"
+    }));
+    localStorage.setItem("currentUserEmail", matched.email || "");
     showToast(`Welcome back, ${matched.fullName || 'User'}!`, 'success');
     setTimeout(() => {
         window.location.href = 'dashboard.html';

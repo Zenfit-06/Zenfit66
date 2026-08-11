@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+ZENFIT — Body Profile
+</title>
+
+<link rel="stylesheet" href="css/body_stats.css">
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+<button onclick="history.back()">
+←
+</button>
+
+<h1>
+Body Profile
+</h1>
+
+</header>
+
+
+
+
+<main class="container">
+
+
+
+<section class="profile-card">
+
+
+
+<!-- LEFT -->
+
+<div class="visual-side">
+
+
+<div class="photo-box">
+
+
+<img 
+id="profilePhoto"
+src="assets/default-user.png"
+>
+
+
+<label for="photoUpload">
+Change Photo
+</label>
+
+
+<input 
+type="file"
+id="photoUpload"
+accept="image/*"
+hidden
+>
+
+
+</div>
+
+
+
+<div class="score-circle">
+
+<strong id="bmiScore">
+0
+</strong>
+
+<span>
+BMI
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<!-- RIGHT -->
+
+<div class="details-side">
+
+
+<h2 id="userName">
+User
+</h2>
+
+
+<p class="goal">
+🎯 Goal:
+<span id="userGoal">
+--
+</span>
+</p>
+
+
+
+
+<div class="stats-grid">
+
+
+<div class="stat">
+
+<h4>
+Height
+</h4>
+
+<strong id="height">
+--
+</strong>
+
+</div>
+
+
+
+<div class="stat">
+
+<h4>
+Weight
+</h4>
+
+<strong id="weight">
+--
+</strong>
+
+</div>
+
+
+
+<div class="stat">
+
+<h4>
+BMI
+</h4>
+
+<strong id="bmi">
+--
+</strong>
+
+</div>
+
+
+
+<div class="stat">
+
+<h4>
+BMR
+</h4>
+
+<strong id="bmr">
+--
+</strong>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="progress-box">
+
+
+<h3>
+Body Composition
+</h3>
+
+
+<div class="line">
+
+<span>
+Body Fat
+</span>
+
+<b id="bodyFat">
+0%
+</b>
+
+
+</div>
+
+
+<div class="bar">
+
+<div id="fatProgress"></div>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<div class="calorie-box">
+
+
+🔥 Daily Calories Need
+
+<strong id="calories">
+0 kcal
+</strong>
+
+
+</div>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+</main>
+
+
+
+
+<script src="js/body_stats.js"></script>
+
+
+</body>
+
+</html>

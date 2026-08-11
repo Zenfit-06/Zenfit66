@@ -9,15 +9,15 @@
   /* Core Theme Colors */
   --bg-page: #F5F7FB;
   --bg-card: #FFFFFF;
-  --text-dark: #1E1B4B;
+  --text-dark: #0F172A;
   --text-main: #0F172A;
   --text-muted: #64748B;
   --text-light: #94A3B8;
 
-  /* Accent Colors matching reference */
-  --purple-primary: #7C3AED;
-  --purple-light: #F3E8FF;
-  --purple-border: #DDD6FE;
+  /* Accent Colors matching reference (Turquoise Theme) */
+  --purple-primary: #00838F;
+  --purple-light: #E0F7FA;
+  --purple-border: #B2EBF2;
   
   --green-primary: #10B981;
   --green-light: #DCFCE7;
@@ -153,20 +153,20 @@ button {
   gap: 8px;
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1E1B4B;
+  color: #0F172A;
   letter-spacing: -0.02em;
 }
 
 .purple-heart-icon {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  background: linear-gradient(135deg, #00838F, #00BCD4);
   color: white;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
   font-size: 14px;
 }
 
@@ -190,15 +190,15 @@ button {
 }
 
 .sidebar-logo-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #F43F5E, #EC4899);
+  background: linear-gradient(135deg, #00838F, #00BCD4);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
 }
 
 .sidebar-logo-text {
@@ -428,7 +428,7 @@ button {
 .x-axis-labels {
   display: flex;
   justify-content: space-between;
-  padding: 10px 30px 0 35px;
+  padding: 10px 30px 0 70px;
 }
 
 .x-axis-day {
@@ -501,7 +501,7 @@ button {
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 700;
-  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 188, 212, 0.35);
   transition: left 0.15s ease;
   pointer-events: none;
 }
@@ -521,7 +521,7 @@ button {
   position: relative;
   height: 4px;
   width: 100%;
-  background: linear-gradient(to right, #DDD6FE 0%, #7C3AED 62.5%, #DDD6FE 100%);
+  background: linear-gradient(to right, #B2EBF2 0%, #00BCD4 62.5%, #00838F 100%);
   border-radius: 2px;
   margin-bottom: 12px;
   cursor: pointer;
@@ -795,6 +795,16 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.nutrition-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nutrition-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(249, 115, 22, 0.12);
 }
 
 .nutrition-header-row {

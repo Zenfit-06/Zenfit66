@@ -52,6 +52,16 @@
         </svg>
         <span>Health</span>
       </a>
+      <a href="nutrition.html" class="nav-item" id="nav-nutrition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+        <span>Nutrition</span>
+      </a>
       <a href="personal_details.html" class="nav-item" id="nav-personal-details">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21a8 8 0 0 0-16 0"/>
@@ -64,7 +74,7 @@
     <div class="sidebar-profile-lower">
       <div class="profile-avatar" id="sidebarAvatar">AK</div>
       <div class="profile-details">
-        <span class="profile-name" id="sidebarUserName">Akshay Kumar</span>
+        <span class="profile-name" id="sidebarUserName">User</span>
         <span class="profile-badge">👑 Pro Member 👋</span>
       </div>
     </div>
@@ -100,8 +110,8 @@
       <button class="header-icon-btn" aria-label="Yoga Practice Mode">
         <i class="fa-solid fa-spa"></i>
       </button>
-      <div class="header-avatar" id="headerAvatar">
-        <span id="headerAvatarText">AK</span>
+      <div class="header-avatar" id="headerAvatar" role="button" tabindex="0" title="Personal Details" onclick="window.location.href='personal_details.html'" style="cursor: pointer;">
+        <span id="headerAvatarText">U</span>
       </div>
     </div>
   </header>
@@ -387,9 +397,6 @@
     </a>
     <a class="tab" href="health.html">
       <i class="fa-solid fa-heart"></i> Health
-    </a>
-    <a class="tab active" href="yoga.html">
-      <i class="fa-solid fa-spa"></i> Yoga
     </a>
     <a class="tab" href="athletes.html">
       <i class="fa-solid fa-users"></i> Athletes
