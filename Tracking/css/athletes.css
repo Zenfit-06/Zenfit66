@@ -36,11 +36,37 @@ min-height:100vh;
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  flex: 1;
+}
+
+.icon-btn-hamburger {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid rgba(0, 188, 212, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 131, 143, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dark, #0F172A);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.icon-btn-hamburger:hover {
+  background: #E0F7FA;
+  color: #00838F;
+  transform: translateY(-1px);
 }
 
 .header-title-group {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .header-title {
@@ -51,31 +77,41 @@ min-height:100vh;
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .header-subtitle {
   font-size: 0.85rem;
   color: var(--text-medium, #64748B);
   margin-top: 2px;
+  white-space: nowrap;
 }
 
 .header-right {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-shrink: 0;
+}
+
+.header-right .sidebar-brand {
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .pro-pill {
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 20px;
   background: linear-gradient(135deg, #00838F, #00BCD4);
   color: white;
   font-weight: 800;
-  font-size: 12px;
-  box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+  font-size: 0.72rem;
+  box-shadow: 0 3px 10px rgba(0, 188, 212, 0.3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .athlete-page {
@@ -722,83 +758,124 @@ box-shadow: 0 4px 16px rgba(0, 188, 212, 0.35);
 font-weight:700;
 }
 
-@media(max-width:700px){
-.top-header{
-padding:14px 16px;
-gap:12px;
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px 14px 90px;
+  }
+
+  .top-header {
+    margin-bottom: 16px;
+  }
+
+  .header-left {
+    gap: 10px;
+  }
+
+  .header-title {
+    font-size: 1.3rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .header-right .sidebar-brand {
+    display: none !important;
+  }
+
+  .icon-btn-hamburger {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
+  }
+
+  .header-icon-btn, .header-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 11px;
+  }
+
+  .athlete-page {
+    padding: 0 0 90px 0;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 16px;
+    gap: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .panel, .athlete-search {
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .subscription-card {
+    padding: 24px 16px;
+    border-radius: 22px;
+  }
+
+  .ai-card {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px;
+    text-align: center;
+  }
 }
 
-.athlete-page{
-padding:16px 12px 90px;
-}
+@media (max-width: 380px) {
+  .main-content {
+    padding: 12px 10px 85px;
+  }
 
-.hero-card{
-flex-direction:column;
-text-align:center;
-padding:20px 16px;
-}
+  .top-header {
+    margin-bottom: 12px;
+  }
 
-.stats-grid{
-grid-template-columns:1fr;
-}
+  .header-title {
+    font-size: 1.12rem;
+  }
 
-.panel, .athlete-search{
-padding:16px 14px;
-}
+  .header-subtitle {
+    font-size: 0.72rem;
+  }
 
-.subscription-card{
-padding:20px 16px;
-}
+  .header-left {
+    gap: 8px;
+  }
 
-.ai-card{
-flex-direction:column;
-gap:20px;
-padding:20px 16px;
-}
+  .header-right {
+    gap: 6px;
+  }
 
-.bottom-nav{
-bottom:14px;
-padding:4px 6px;
-gap:3px;
-max-width: calc(100vw - 16px);
-}
+  .icon-btn-hamburger {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 10px;
+  }
 
-.bottom-nav a{
-padding:8px 14px;
-font-size:0.82rem;
-gap:6px;
-}
-}
+  .header-icon-btn, .header-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+  }
 
-@media(max-width:380px){
-.top-header{
-padding:12px 10px;
-gap:8px;
-}
-
-.athlete-page{
-padding:12px 8px 80px;
-}
-
-.hero-card, .panel, .athlete-search, .subscription-card, .ai-card{
-padding:14px 10px;
-}
-
-.bottom-nav{
-bottom:10px;
-padding:3px 4px;
-gap:2px;
-max-width: calc(100vw - 10px);
-}
-
-.bottom-nav a{
-padding:7px 8px;
-font-size:0.76rem;
-gap:4px;
-}
-
-.bottom-nav a svg{
-width:15px;
-height:15px;
-}
+  .hero-card, .panel, .athlete-search, .subscription-card, .ai-card {
+    padding: 14px 10px;
+    border-radius: 16px;
+  }
 }

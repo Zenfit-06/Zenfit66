@@ -71,6 +71,12 @@ if (sidebarBackdrop) {
   });
 }
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.body.classList.remove('sidebar-open');
+  }
+});
+
 // Logout
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
