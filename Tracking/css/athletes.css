@@ -24,109 +24,65 @@ min-height:100vh;
 
 
 
-.top-header{
-
-display:flex;
-align-items:center;
-gap:18px;
-
-padding:20px 30px;
-
-position:sticky;
-top:0;
-
-background:rgba(255,255,255,0.92);
-backdrop-filter:blur(15px);
--webkit-backdrop-filter:blur(15px);
-border-bottom:1px solid rgba(0, 188, 212, 0.1);
-
-z-index:10;
-
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
 }
 
-
-
-.back-btn{
-
-width:42px;
-height:42px;
-
-border-radius:50%;
-
-border:none;
-
-background:#E0F7FA;
-
-color:#00838F;
-
-font-size:22px;
-
-cursor:pointer;
-transition: all 0.25s ease;
-
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.back-btn:hover{
-background:#B2EBF2;
-transform: translateY(-2px);
+.header-title-group {
+  display: flex;
+  flex-direction: column;
 }
 
-
-
-.brand h1{
-
-margin:0;
-
-font-size:22px;
-font-weight:800;
-color:#0F172A;
-
+.header-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-dark, #0F172A);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-
-.brand p{
-
-margin:3px 0;
-
-font-size:13px;
-
-color:#64748B;
-
+.header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-medium, #64748B);
+  margin-top: 2px;
 }
 
-
-
-.pro-pill{
-
-margin-left:auto;
-
-padding:7px 15px;
-
-border-radius:20px;
-
-background:
-linear-gradient(135deg,#00838F,#00BCD4);
-
-color:white;
-
-font-weight:800;
-font-size:13px;
-box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
-
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
+.pro-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #00838F, #00BCD4);
+  color: white;
+  font-weight: 800;
+  font-size: 12px;
+  box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
-
-.athlete-page{
-
-padding:20px;
-
-max-width:900px;
-
-margin:auto;
-
-padding-bottom:100px;
-
+.athlete-page {
+  padding: 0 0 100px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 
@@ -721,39 +677,27 @@ box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 
 
 .bottom-nav{
-
-
 position:fixed;
-
 bottom:20px;
-
 left:50%;
 transform: translateX(-50%);
-
-height:55px;
-
+height:auto;
 background:#FFFFFF;
 border-radius: 40px;
 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 width: fit-content;
+max-width: calc(100vw - 20px);
 padding: 5px 10px;
 border: 1px solid rgba(0, 0, 0, 0.05);
-
 display:flex;
-
 justify-content:center;
 gap: 6px;
-
 align-items:center;
-
+z-index: 1000;
 }
 
-
-
 .bottom-nav a{
-
 color:#64748B;
-
 text-decoration:none;
 display: flex;
 align-items: center;
@@ -763,7 +707,7 @@ border-radius: 24px;
 font-weight: 600;
 font-size: 0.85rem;
 transition: all 0.25s ease;
-
+white-space: nowrap;
 }
 
 .bottom-nav a:hover:not(.active){
@@ -771,47 +715,90 @@ background: #F1F5F9;
 color: #0F172A;
 }
 
-
 .bottom-nav .active{
-
 background: linear-gradient(135deg, #00838F, #00BCD4);
 color: white;
 box-shadow: 0 4px 16px rgba(0, 188, 212, 0.35);
-
 font-weight:700;
-
 }
-
-
-
 
 @media(max-width:700px){
+.top-header{
+padding:14px 16px;
+gap:12px;
+}
 
+.athlete-page{
+padding:16px 12px 90px;
+}
 
 .hero-card{
-
 flex-direction:column;
-
 text-align:center;
-
+padding:20px 16px;
 }
-
 
 .stats-grid{
-
 grid-template-columns:1fr;
-
 }
 
+.panel, .athlete-search{
+padding:16px 14px;
+}
+
+.subscription-card{
+padding:20px 16px;
+}
 
 .ai-card{
-
 flex-direction:column;
-
 gap:20px;
-
+padding:20px 16px;
 }
 
+.bottom-nav{
+bottom:14px;
+padding:4px 6px;
+gap:3px;
+max-width: calc(100vw - 16px);
+}
 
+.bottom-nav a{
+padding:8px 14px;
+font-size:0.82rem;
+gap:6px;
+}
+}
 
+@media(max-width:380px){
+.top-header{
+padding:12px 10px;
+gap:8px;
+}
+
+.athlete-page{
+padding:12px 8px 80px;
+}
+
+.hero-card, .panel, .athlete-search, .subscription-card, .ai-card{
+padding:14px 10px;
+}
+
+.bottom-nav{
+bottom:10px;
+padding:3px 4px;
+gap:2px;
+max-width: calc(100vw - 10px);
+}
+
+.bottom-nav a{
+padding:7px 8px;
+font-size:0.76rem;
+gap:4px;
+}
+
+.bottom-nav a svg{
+width:15px;
+height:15px;
+}
 }

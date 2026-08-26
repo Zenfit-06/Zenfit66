@@ -233,16 +233,28 @@ function setupSleepChart() {
   renderSleepGraph(sleepData);
 }
 
+let currentSleepData = null;
+
 function renderSleepGraph(data) {
+  if (data) {
+    currentSleepData = data;
+  } else {
+    data = currentSleepData;
+  }
+  if (!data || !data.length) return;
+
   const container = document.getElementById('sleepChartContainer');
   if (!container) return;
 
-  const width = 850;
-  const height = 220;
-  const paddingLeft = 70;
-  const paddingRight = 30;
-  const paddingTop = 35;
-  const paddingBottom = 30;
+  const isMobile = window.innerWidth <= 640;
+  const isSmallMobile = window.innerWidth <= 380;
+
+  const width = isMobile ? (isSmallMobile ? 320 : 380) : 850;
+  const height = isMobile ? (isSmallMobile ? 145 : 160) : 220;
+  const paddingLeft = isMobile ? (isSmallMobile ? 32 : 36) : 70;
+  const paddingRight = isMobile ? (isSmallMobile ? 10 : 14) : 30;
+  const paddingTop = isMobile ? 22 : 35;
+  const paddingBottom = isMobile ? 18 : 30;
 
   const maxVal = 10; // 10h
   const minVal = 0;
@@ -272,48 +284,55 @@ function renderSleepGraph(data) {
   const areaD = `${pathD} L ${points[points.length - 1].x} ${paddingTop + chartHeight} L ${points[0].x} ${paddingTop + chartHeight} Z`;
 
   // Grid Lines Y
-  const yTicks = [10, 8, 6, 4, 2, 0];
+  const yTicks = isMobile ? [10, 6, 2, 0] : [10, 8, 6, 4, 2, 0];
   let gridSvg = '';
+  const yTickFontSize = isMobile ? (isSmallMobile ? 9 : 10) : 11;
   yTicks.forEach(tick => {
     const y = paddingTop + chartHeight - (tick / maxVal) * chartHeight;
     gridSvg += `
       <line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="#F1F5F9" stroke-width="1.5" stroke-dasharray="0" />
-      <text x="${paddingLeft - 18}" y="${y + 4}" fill="#94A3B8" font-size="11" font-weight="500" text-anchor="end">${tick}h</text>
+      <text x="${paddingLeft - (isMobile ? 6 : 18)}" y="${y + 3.5}" fill="#94A3B8" font-size="${yTickFontSize}" font-weight="500" text-anchor="end">${tick}h</text>
     `;
   });
 
   // Markers & Labels SVG
   let pointsSvg = '';
+  const pointFontSize = isMobile ? (isSmallMobile ? 9 : 10) : 11;
+  const circleRadius = isMobile ? (isSmallMobile ? 3.5 : 4) : 5;
+  const highlightCircleRadius = isMobile ? (isSmallMobile ? 4.5 : 5.5) : 6;
+
   points.forEach((p, idx) => {
-    // Adjust text alignment for the first data point to keep it clear of Y-axis ticks
     let textAnchor = 'middle';
     let textX = p.x;
     if (idx === 0) {
-      textAnchor = 'start';
-      textX = p.x - 5;
+      textAnchor = isMobile ? 'middle' : 'start';
+      textX = isMobile ? p.x : p.x - 5;
     } else if (idx === points.length - 1 && !p.highlight) {
-      textAnchor = 'end';
-      textX = p.x + 5;
+      textAnchor = isMobile ? 'middle' : 'end';
+      textX = isMobile ? p.x : p.x + 5;
     }
 
     // Value text floating above dot if defined
     let valueText = `
-      <text x="${textX}" y="${p.y - 10}" fill="${p.highlight ? '#00838F' : '#64748B'}" font-size="11" font-weight="${p.highlight ? '700' : '600'}" text-anchor="${textAnchor}">${p.label}</text>
+      <text x="${textX}" y="${p.y - (isMobile ? 7 : 10)}" fill="${p.highlight ? '#00838F' : '#64748B'}" font-size="${pointFontSize}" font-weight="${p.highlight ? '700' : '600'}" text-anchor="${textAnchor}">${isMobile ? p.label.replace(' ', '') : p.label}</text>
     `;
 
     // Sunday Callout Badge
     if (p.highlight) {
+      const badgeW = isMobile ? (isSmallMobile ? 44 : 50) : 60;
+      const badgeH = isMobile ? 18 : 22;
+      const badgeYOffset = isMobile ? 18 : 28;
       valueText = `
-        <g transform="translate(${p.x}, ${p.y - 28})">
-          <rect x="-30" y="-12" width="60" height="22" rx="11" fill="#00838F" />
-          <text x="0" y="3" fill="#FFFFFF" font-size="11" font-weight="700" text-anchor="middle">${p.label}</text>
+        <g transform="translate(${p.x}, ${p.y - badgeYOffset})">
+          <rect x="${-badgeW / 2}" y="${-badgeH / 2}" width="${badgeW}" height="${badgeH}" rx="${badgeH / 2}" fill="#00838F" />
+          <text x="0" y="3.5" fill="#FFFFFF" font-size="${pointFontSize}" font-weight="700" text-anchor="middle">${p.label}</text>
         </g>
       `;
     }
 
     pointsSvg += `
       ${valueText}
-      <circle cx="${p.x}" cy="${p.y}" r="${p.highlight ? 6 : 5}" fill="${p.highlight ? '#00838F' : '#00BCD4'}" stroke="#FFFFFF" stroke-width="2.5" />
+      <circle cx="${p.x}" cy="${p.y}" r="${p.highlight ? highlightCircleRadius : circleRadius}" fill="${p.highlight ? '#00838F' : '#00BCD4'}" stroke="#FFFFFF" stroke-width="${isMobile ? 2 : 2.5}" />
     `;
   });
 
@@ -333,7 +352,7 @@ function renderSleepGraph(data) {
       <path d="${areaD}" fill="url(#sleepGradient)" />
 
       <!-- Smooth Curve Line -->
-      <path d="${pathD}" fill="none" stroke="#00BCD4" stroke-width="3" stroke-linecap="round" />
+      <path d="${pathD}" fill="none" stroke="#00BCD4" stroke-width="${isMobile ? 2.5 : 3}" stroke-linecap="round" />
 
       <!-- Data Points & Callout Badges -->
       ${pointsSvg}
@@ -342,6 +361,15 @@ function renderSleepGraph(data) {
 
   container.innerHTML = svgContent;
 }
+
+// Window resize listener for responsive sleep chart re-render
+let sleepChartResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(sleepChartResizeTimer);
+  sleepChartResizeTimer = setTimeout(() => {
+    if (currentSleepData) renderSleepGraph();
+  }, 150);
+});
 
 /**
  * Height Ruler Slider Interaction

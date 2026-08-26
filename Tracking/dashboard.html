@@ -2,63 +2,996 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <title>ZENFIT — Dashboard</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
+        :root {
+            --primary: #00BCD4;
+            --primary-light: #26C6DA;
+            --primary-lighter: rgba(0, 188, 212, 0.08);
+            --primary-dark: #00838F;
+            --accent-orange: #FF7043;
+            --accent-green: #10B981;
+            --accent-cyan: #00BCD4;
+            --accent-purple: #8B5CF6;
+            --text-dark: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            --text-light: #94A3B8;
+            --bg-main: #F0FAFB;
+            --bg-card: #FFFFFF;
+            --border-color: rgba(0, 188, 212, 0.12);
+            --card-radius: 20px;
+            --shadow-sm: 0 2px 10px rgba(0, 131, 143, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 131, 143, 0.08);
+            --shadow-lg: 0 16px 40px rgba(0, 131, 143, 0.14);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #F0FAFB;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
             background-image:
                 radial-gradient(circle at 10% 20%, rgba(0, 188, 212, 0.06) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(38, 198, 218, 0.06) 0%, transparent 40%),
                 radial-gradient(circle at 50% 50%, rgba(0, 131, 143, 0.03) 0%, transparent 60%);
-            color: #0F172A;
+            color: var(--text-dark);
             min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.45;
         }
 
         body.sidebar-open {
             overflow: hidden;
         }
 
-        button,
-        input {
+        button, input, select {
             font: inherit;
         }
 
         button {
             cursor: pointer;
+            border: none;
+            outline: none;
+            background: none;
         }
 
-        /* =========================
-           SIDEBAR
-        ========================= */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Hide scrollbars */
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        *::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* =====================================================
+           TOP HEADER
+        ====================================================== */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 32px;
+            position: relative;
+            z-index: 50;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .hamburger-btn {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 14px;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+        }
+
+        .hamburger-btn:hover {
+            background: #E0F7FA;
+            color: var(--primary-dark);
+            transform: scale(1.03);
+        }
+
+        .hamburger-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hamburger-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .greeting-wrap {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .greeting {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .greeting-sub {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 6px;
+            user-select: none;
+        }
+
+        .header-brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+        }
+
+        .header-brand-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.03em;
+        }
+
+        .header-icon-btn {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .header-icon-btn:hover {
+            background: #E0F7FA;
+            color: var(--primary-dark);
+            transform: scale(1.03);
+        }
+
+        .header-icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            box-shadow: 0 0 0 2px white;
+        }
+
+        .header-avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.3);
+            border: 2px solid white;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .header-avatar:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 18px rgba(0, 188, 212, 0.4);
+        }
+
+        .header-avatar:active {
+            transform: scale(0.95);
+        }
+
+        .online-dot {
+            width: 9px;
+            height: 9px;
+            background: #10B981;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        /* =====================================================
+           MAIN DASHBOARD
+        ====================================================== */
+        .dashboard {
+            padding: 8px 32px 110px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--card-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 188, 212, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .card-title {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card-icon.blue {
+            background: #E0F7FA;
+            color: var(--primary-dark);
+        }
+
+        .card-icon.orange {
+            background: #FFF3E0;
+            color: var(--accent-orange);
+        }
+
+        .card-icon.cyan {
+            background: #E0F7FA;
+            color: var(--primary);
+        }
+
+        .card-icon.purple {
+            background: #EDE7F6;
+            color: var(--accent-purple);
+        }
+
+        .card-icon.green {
+            background: #E8F5E9;
+            color: var(--accent-green);
+        }
+
+        .info-pill {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .info-pill:hover {
+            color: var(--primary-dark);
+        }
+
+        /* =====================================================
+           TOP STATS GRID
+        ====================================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card,
+        .fitness-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 175px;
+        }
+
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .stat-value span:last-child {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .stat-goal {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .progress-container {
+            height: 7px;
+            border-radius: 20px;
+            background: #EDF2F7;
+            margin-top: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            width: var(--progress, 0%);
+            border-radius: inherit;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .progress.blue {
+            background: linear-gradient(90deg, #00838F, #00ACC1);
+        }
+
+        .progress.orange {
+            background: linear-gradient(90deg, #FF7043, #FFA726);
+        }
+
+        .progress.cyan {
+            background: linear-gradient(90deg, #00BCD4, #26C6DA);
+        }
+
+        .progress-label {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Fitness Score Card Specifics */
+        .fitness-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .fitness-score {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .fitness-score span:last-child {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .score-status {
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--accent-green);
+            font-size: 0.84rem;
+            font-weight: 700;
+            background: #E8F5E9;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .score-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        .score-ring {
+            width: 82px;
+            height: 82px;
+            min-width: 82px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #10B981 var(--score-degree, 0deg),
+                #E2E8F0 0deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.6s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .score-ring::after {
+            content: "";
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* =====================================================
+           BOTTOM GRID
+        ====================================================== */
+        .bottom-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 18px;
+        }
+
+        .body-stats,
+        .heatmap-card,
+        .activity-card {
+            min-height: 330px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Body Stats Card */
+        .body-stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            margin-bottom: 16px;
+        }
+
+        .body-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            transition: all 0.2s ease;
+        }
+
+        .body-row:hover {
+            background: #E0F7FA;
+            border-color: rgba(0, 188, 212, 0.2);
+        }
+
+        .body-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: var(--primary);
+            font-size: 1.1rem;
+            box-shadow: 0 2px 6px rgba(0, 188, 212, 0.1);
+        }
+
+        .body-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .body-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .body-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 1px;
+        }
+
+        .details-btn {
+            width: 100%;
+            height: 42px;
+            min-height: 42px;
+            border: 0;
+            background: #E0F7FA;
+            color: var(--primary-dark);
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: auto;
+        }
+
+        .details-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .details-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Heatmap Card */
+        .see-all {
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .see-all:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .heatmap-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 14px 0 16px;
+        }
+
+        .heat-stat {
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            border-radius: 14px;
+            padding: 12px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            transition: all 0.2s ease;
+        }
+
+        .heat-stat:hover {
+            background: #E0F7FA;
+            border-color: rgba(0, 188, 212, 0.2);
+        }
+
+        .heat-stat span {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .heat-stat-content {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .heat-stat strong {
+            display: block;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .heat-stat small {
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            font-weight: 500;
+            display: block;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .month {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 6px;
+            flex: 1;
+        }
+
+        .heat-cell,
+        .heatmap-cell {
+            aspect-ratio: 1;
+            min-height: 22px;
+            border-radius: 6px;
+            background: #EEF2F6;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .heat-cell:hover,
+        .heatmap-cell:hover {
+            transform: scale(1.18);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            z-index: 2;
+        }
+
+        .legend {
+            margin-top: 18px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .legend-squares {
+            display: flex;
+            gap: 4px;
+        }
+
+        .legend-square {
+            width: 11px;
+            height: 11px;
+            border-radius: 3px;
+        }
+
+        .l0 { background: #EEF2F6; }
+        .l1 { background: #C6E48B; }
+        .l2 { background: #7BC96F; }
+        .l3 { background: #239A3B; }
+        .l4 { background: #196127; }
+
+        /* Latest Activity Card */
+        .activity-map-wrap {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #E0F7FA, #E8F5E9);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+        }
+
+        .activity-map {
+            height: 135px;
+            width: 100%;
+            border-radius: 14px;
+            z-index: 1;
+        }
+
+        .map-hover-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .activity-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .activity-icon-wrap {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 12px;
+            background: #E0F7FA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .activity-meta {
+            min-width: 0;
+        }
+
+        .activity-name {
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-time {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            padding: 12px 8px;
+            border-radius: 14px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .activity-stat-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .activity-stat-label {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .activity-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #E8F5E9;
+            color: #16A34A;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            margin-top: 12px;
+            align-self: flex-start;
+        }
+
+        /* =====================================================
+           FLOATING BOTTOM NAVIGATION BAR
+        ====================================================== */
+        .bottom-tabs {
+            position: fixed;
+            bottom: calc(14px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 5px;
+            border-radius: 36px;
+            box-shadow: 0 12px 36px rgba(0, 131, 143, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 188, 212, 0.22);
+            z-index: 1000;
+            gap: 4px;
+            width: calc(100% - 32px);
+            max-width: 400px;
+        }
+
+        .bottom-tabs .tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 8px 16px;
+            border-radius: 28px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .bottom-tabs .tab:hover:not(.active) {
+            background: #E0F7FA;
+            color: var(--primary-dark);
+        }
+
+        .bottom-tabs .tab.active {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+            font-weight: 700;
+        }
+
+        .bottom-tabs .tab svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* =====================================================
+           SIDEBAR DRAWER
+        ====================================================== */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
+        }
+
+        body.sidebar-open .sidebar-backdrop,
+        .sidebar-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
 
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            width: 270px;
+            width: min(290px, 84vw);
             height: 100vh;
             background: white;
-            z-index: 10000;
-            padding: 25px 18px;
-            box-shadow: 8px 0 30px rgba(0,0,0,.08);
-
-            transform: translateX(-110%);
-            transition: transform .25s ease;
-
+            z-index: 9999;
+            padding: 24px 18px calc(24px + var(--safe-bottom));
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.15);
+            transform: translateX(-105%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.open {
@@ -69,823 +1002,357 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 35px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #F1F5F9;
         }
 
-        .sidebar-brand {
+        .sidebar-brand-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 20px;
-            font-weight: 800;
         }
 
-        .sidebar-brand-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #00838F, #00BCD4);
-            color: white;
+        .sidebar-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.03em;
         }
 
         .sidebar-close {
-            width: 38px;
-            height: 38px;
-            border: 0;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
-            background: #f1f5f8;
-            color: #34495e;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item {
-            width: 100%;
-            min-height: 48px;
-            border: 0;
-            background: transparent;
-            border-radius: 12px;
-            padding: 0 15px;
+            background: #F1F5F9;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 13px;
-            color: #60758b;
-            font-size: 14px;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-close:hover {
+            background: #E2E8F0;
+            color: var(--text-dark);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 14px;
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-avatar {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.25);
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            width: 100%;
+            min-height: 46px;
+            border-radius: 12px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
             font-weight: 600;
             text-align: left;
-            transition: .18s ease;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        .nav-item:hover,
-        .nav-item.active {
+        .sidebar-item:hover {
+            background: #F1F5F9;
+            color: var(--text-dark);
+        }
+
+        .sidebar-item.active {
             background: #E0F7FA;
-            color: #00838F;
+            color: var(--primary-dark);
+            font-weight: 700;
         }
 
-        .sidebar-divider {
-            height: 1px;
-            background: #e8edf1;
-            margin: 20px 5px;
+        .sidebar-footer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #F1F5F9;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .logout-btn {
-            color: #ef4444;
+            color: #EF4444 !important;
         }
 
         .logout-btn:hover {
-            background: #fff0f0;
-            color: #dc2626;
+            background: #FEF2F2 !important;
+            color: #DC2626 !important;
         }
 
-        .sidebar-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(16,33,59,.45);
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .25s ease;
-        }
-
-        .sidebar-backdrop.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        .top-header {
-            height: 108px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px 35px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .hamburger-btn {
-            width: 46px;
-            height: 46px;
-            border: 0;
-            border-radius: 15px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #00838F;
-            box-shadow: 0 3px 12px rgba(0, 131, 143, 0.08);
-            font-size: 22px;
-        }
-
-        .hamburger-btn:hover {
-            background: #E0F7FA;
-        }
-
-        .greeting {
-            font-size: 23px;
-            font-weight: 700;
-            color: #10213b;
-        }
-
-        .greeting-sub {
-            margin-top: 5px;
-            color: #7890a9;
-            font-size: 14px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 19px;
-            margin-right: 8px;
-        }
-
-        .brand-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #00838F, #00BCD4);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .header-icon-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 0;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .notif-dot {
-            position: absolute;
-            top: 7px;
-            right: 8px;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #FF7043;
-        }
-
-        .header-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00838F, #26C6DA);
-            color: white;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.3);
-            transition: all 0.25s ease;
-        }
-
-        .online-dot {
-            width: 9px;
-            height: 9px;
-            background: #25d37b;
-            border: 2px solid white;
-            border-radius: 50%;
-            position: absolute;
-            right: 0;
-            bottom: 0;
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .dashboard {
-            padding: 5px 34px 30px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 17px;
-        }
-
-        .bottom-grid {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: 1.05fr 1.1fr 1.05fr;
-            gap: 17px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 131, 143, 0.06);
-            border: 1px solid rgba(0, 188, 212, 0.08);
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.012);
-            box-shadow: 0 20px 42px rgba(0, 131, 143, 0.16);
-            border-color: rgba(0, 188, 212, 0.35);
-        }
-
-        .card .card-icon {
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-
-        .card:hover .card-icon {
-            transform: scale(1.12) rotate(4deg);
-        }
-
-        .stat-card,
-        .fitness-card {
-            min-height: 168px;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 23px;
-        }
-
-        .card-header-left {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
-
-        .card-title {
-            color: #526a84;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .card-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .blue {
-            background: #E0F7FA;
-            color: #00838F;
-        }
-
-        .orange {
-            background: #FFF3E0;
-            color: #FF7043;
-        }
-
-        .cyan {
-            background: #E0F7FA;
-            color: #00BCD4;
-        }
-
-        .purple {
-            background: #E8F5E9;
-            color: #66BB6A;
-        }
-
-        .green {
-            background: #e5faef;
-            color: #16b86a;
-        }
-
-        .stat-value {
-            font-size: 30px;
-            font-weight: 800;
-            color: #10213b;
-        }
-
-        .stat-value span {
-            font-size: 14px;
-            font-weight: 500;
-            color: #7890a9;
-        }
-
-        .stat-goal {
-            color: #8295aa;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .progress-container {
-            height: 7px;
-            border-radius: 20px;
-            background: #edf2f6;
-            margin-top: 14px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            width: var(--progress, 0%);
-            border-radius: inherit;
-            transition: width .35s ease;
-        }
-
-        .progress.blue {
-            background: #00838F;
-        }
-
-        .progress.orange {
-            background: #FF7043;
-        }
-
-        .progress.cyan {
-            background: #00BCD4;
-        }
-
-        .progress-label {
-            margin-top: 9px;
-            font-size: 12px;
-            color: #667d96;
-        }
-
-        /* =========================
-           FITNESS
-        ========================= */
-
-        .fitness-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fitness-score {
-            font-size: 31px;
-            font-weight: 800;
-        }
-
-        .fitness-score span {
-            font-size: 13px;
-            font-weight: 500;
-            color: #7c90a6;
-        }
-
-        .score-status {
-            margin-top: 7px;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: #18ae6c;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .score-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #19b878;
-        }
-
-        .score-ring {
-            width: 83px;
-            height: 83px;
-            border-radius: 50%;
-            background:
-                conic-gradient(
-                    #16b99a var(--score-degree, 0deg),
-                    #e6e9ed 0deg
-                );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .score-ring::after {
-            content: "";
-            width: 65px;
-            height: 65px;
-            background: white;
-            border-radius: 50%;
-        }
-
-        /* =========================
-           BODY STATS
-        ========================= */
-
-        .body-stats,
-        .heatmap-card,
-        .activity-card {
-            min-height: 316px;
-        }
-
-        .body-row {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            margin-bottom: 19px;
-        }
-
-        .body-icon {
-            width: 37px;
-            height: 37px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #edf8ff;
-            color: #10afd9;
-        }
-
-        .body-value {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .body-label {
-            font-size: 11px;
-            color: #7b91a8;
-            margin-top: 2px;
-        }
-
-        .details-btn {
-            width: 100%;
-            height: 34px;
-            border: 0;
-            background: #E0F7FA;
-            color: #00838F;
-            border-radius: 10px;
-            margin-top: 2px;
-            font-size: 12px;
-        }
-
-        /* =========================
-           HEATMAP
-        ========================= */
-
-        .see-all {
-            color: #00838F;
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .month {
-            font-size: 14px;
-            color: #526a84;
-            font-weight: 600;
-            margin-bottom: 18px;
-        }
-
-        .heatmap {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 7px;
-            margin-top: 45px;
-        }
-
-        .heatmap-cell {
-            height: 20px;
-            border-radius: 4px;
-            background: #ebedf0;
-        }
-
-        .heatmap-cell[data-level="1"] {
-            background: #c6e48b;
-        }
-
-        .heatmap-cell[data-level="2"] {
-            background: #7bc96f;
-        }
-
-        .heatmap-cell[data-level="3"] {
-            background: #239a3b;
-        }
-
-        .heatmap-cell[data-level="4"] {
-            background: #196127;
-        }
-
-        .legend {
-            margin-top: 30px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 7px;
-            font-size: 10px;
-            color: #71869b;
-        }
-
-        .legend-squares {
-            display: flex;
-            gap: 3px;
-        }
-
-        .legend-square {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-        }
-
-        .l0 { background:#ebedf0; }
-        .l1 { background:#c6e48b; }
-        .l2 { background:#7bc96f; }
-        .l3 { background:#239a3b; }
-        .l4 { background:#196127; }
-
-        /* =========================
-           ACTIVITY
-        ========================= */
-
-        .activity-map {
-            height: 118px;
-            border-radius: 13px;
-            background: linear-gradient(
-                135deg,
-                #e2f5ff,
-                #e9faee
-            );
-            margin-bottom: 17px;
-        }
-
-        .activity-title {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-        }
-
-        .activity-name {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .activity-time {
-            color: #7a90a5;
-            font-size: 11px;
-            margin-top: 3px;
-        }
-
-        .activity-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            margin-top: 15px;
-        }
-
-        .activity-stat-value {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .activity-stat-label {
-            font-size: 10px;
-            color: #7c91a6;
-            margin-top: 2px;
-        }
-
-        .activity-badge {
-            display: inline-block;
-            background: #ddfae9;
-            color: #18aa68;
-            border-radius: 20px;
-            padding: 6px 13px;
-            font-size: 10px;
-            margin-top: 13px;
-        }
-
-        /* Bottom nav handled by external dashboard.css */
-
-        /* =========================
-           FLOATING BOTTOM TAB BAR (matches Health section)
-        ========================= */
-
-        .bottom-tabs {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            z-index: 90;
-            background: white;
-            border-radius: 30px;
-            padding: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: fit-content;
-        }
-
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border-radius: 24px;
-            color: #64748B;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.25s ease;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-        }
-
-        .tab:hover:not(.active) {
-            background-color: #E0F7FA;
-            color: #00838F;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #00838F, #00BCD4);
-            color: white;
-            box-shadow: 0 4px 16px rgba(0, 188, 212, 0.35);
-        }
-
-        /* =========================
-           MODAL
-        ========================= */
-
+        /* =====================================================
+           PROFILE EDIT MODAL
+        ====================================================== */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(20,30,42,.58);
-            backdrop-filter: blur(5px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 99999;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
         }
 
         .modal-overlay.show {
             display: flex;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
         .profile-modal {
-            width: 540px;
-            max-width: 100%;
-            max-height: 92vh;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
             overflow-y: auto;
             background: white;
-            border-radius: 22px;
-            padding: 30px;
-            box-shadow: 0 25px 80px rgba(0,0,0,.22);
+            border-radius: 24px;
+            padding: 26px 22px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 188, 212, 0.15);
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95) translateY(10px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         .modal-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 27px;
+            align-items: center;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #F1F5F9;
         }
 
         .modal-heading {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 14px;
         }
 
         .modal-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #10213b;
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 17px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.3);
         }
 
         .modal-title {
-            font-size: 22px;
+            font-size: 1.35rem;
             font-weight: 800;
-            color: #10213b;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
 
         .modal-subtitle {
-            color: #7890a9;
-            font-size: 13px;
-            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-top: 2px;
         }
 
         .modal-close {
-            width: 38px;
-            height: 38px;
-            border: 0;
-            border-radius: 50%;
-            background: #f2f6f9;
-            color: #38516c;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #F1F5F9;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #E2E8F0;
+            color: var(--text-dark);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .form-group {
-            margin-bottom: 19px;
+            margin-bottom: 14px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-label {
             display: block;
-            font-size: 13px;
+            font-size: 0.84rem;
             font-weight: 700;
-            color: #17304e;
-            margin-bottom: 8px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
         }
 
         .form-input {
             width: 100%;
-            height: 48px;
-            border: 1px solid #d9e2eb;
-            border-radius: 10px;
+            height: 46px;
+            border: 1px solid #CBD5E1;
+            border-radius: 12px;
             padding: 0 14px;
-            color: #162c46;
+            color: var(--text-dark);
             outline: none;
-            background: white;
+            background: #F8FAFC;
+            font-size: 16px; /* Prevents auto-zoom on iOS */
+            transition: all 0.2s ease;
         }
 
         .form-input:focus {
-            border-color: #00BCD4;
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.10);
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
         }
 
         .error-text {
-            min-height: 17px;
-            margin-top: 5px;
-            color: #ef4444;
-            font-size: 11px;
+            min-height: 16px;
+            margin-top: 4px;
+            color: #EF4444;
+            font-size: 0.76rem;
+            font-weight: 500;
         }
 
         .password-section {
-            border-top: 1px solid #e3e8ed;
-            margin-top: 7px;
-            padding-top: 20px;
+            border-top: 1px solid #F1F5F9;
+            margin-top: 10px;
+            padding-top: 16px;
         }
 
         .password-heading {
-            font-size: 16px;
+            font-size: 1.05rem;
             font-weight: 800;
-            margin-bottom: 17px;
+            color: var(--text-dark);
+            margin-bottom: 14px;
         }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 26px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #F1F5F9;
         }
 
         .btn {
-            min-width: 90px;
-            height: 48px;
-            border: 0;
-            border-radius: 11px;
+            min-width: 100px;
+            height: 46px;
+            border-radius: 12px;
             padding: 0 20px;
             font-weight: 700;
+            font-size: 0.92rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .btn-cancel {
-            background: #f1f5f8;
-            color: #243c57;
+            background: #F1F5F9;
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background: #E2E8F0;
+            color: var(--text-dark);
         }
 
         .btn-save {
-            background: #10213b;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: white;
+            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.3);
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
         }
 
         .save-message {
             display: none;
-            margin-top: 14px;
-            padding: 10px 12px;
-            border-radius: 9px;
-            background: #e4faee;
-            color: #148653;
-            font-size: 12px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #E8F5E9;
+            color: #16A34A;
+            font-size: 0.84rem;
             font-weight: 600;
         }
 
@@ -893,203 +1360,14 @@
             display: block;
         }
 
+        /* =====================================================
+           RESPONSIVE DESIGN (TABLET & MOBILE)
+        ====================================================== */
 
-/* SIDEBAR USER */
-
-.sidebar-user {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:25px;
-}
-
-
-.sidebar-avatar {
-    width:45px;
-    height:45px;
-    border-radius:50%;
-    background: linear-gradient(135deg, #00838F, #00BCD4);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-}
-
-
-.sidebar-user strong {
-    display:block;
-    font-size:15px;
-}
-
-
-.sidebar-user small {
-    display:block;
-    color:#7890a9;
-    font-size:12px;
-}
-
-
-/* SIDEBAR BUTTON FIX */
-
-.sidebar-menu {
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-
-.sidebar-item {
-    width:100%;
-    height:48px;
-    border:0;
-    background:transparent;
-    border-radius:12px;
-    padding:0 14px;
-
-    display:flex;
-    align-items:center;
-    gap:12px;
-
-    color:#60758b;
-    font-size:14px;
-    font-weight:600;
-
-    cursor:pointer;
-}
-
-
-.sidebar-item:hover,
-.sidebar-item.active {
-
-    background:#E0F7FA;
-    color:#00838F;
-
-}
-
-
-.sidebar-footer {
-    margin-top:30px;
-}
-
-
-
-.heatmap-summary{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    margin-top:25px;
-}
-
-
-.heat-stat{
-    flex:1;
-    background:#f7fbff;
-    border-radius:14px;
-    padding:14px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-
-.heat-stat span{
-    font-size:24px;
-}
-
-
-.heat-stat strong{
-    display:block;
-    font-size:18px;
-    color:#16345c;
-}
-
-
-.heat-stat small{
-    color:#6d88aa;
-    font-size:12px;
-}
-
-
-
-/* heat cells */
-
-#heatmap{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:8px;
-    margin-top:25px;
-}
-
-
-.heat-cell{
-    height:22px;
-    border-radius:6px;
-    background:#edf2f5;
-    cursor:pointer;
-    transition:.2s;
-}
-
-
-.heat-cell:hover{
-    transform:scale(1.15);
-}
-
-        /* =========================
-           FLOATING BOTTOM NAVIGATION
-        ========================= */
-        .bottom-tabs {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 6px;
-            border-radius: 40px;
-            box-shadow: 0 12px 32px rgba(0, 131, 143, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 188, 212, 0.2);
-            z-index: 1000;
-            gap: 4px;
-        }
-
-        .bottom-tabs .tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 22px;
-            border-radius: 30px;
-            border: none;
-            background: transparent;
-            color: #64748B;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            text-decoration: none;
-        }
-
-        .bottom-tabs .tab:hover {
-            background: #E0F7FA;
-            color: #00838F;
-        }
-
-        .bottom-tabs .tab.active {
-            background: linear-gradient(135deg, #00838F, #00BCD4);
-            color: white;
-            box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width:1050px) {
+        /* Tablet (<= 1080px) */
+        @media (max-width: 1080px) {
             .stats-grid {
-                grid-template-columns: repeat(2,1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .bottom-grid {
@@ -1097,42 +1375,258 @@
             }
         }
 
-        @media (max-width:650px) {
+        /* Mobile Standard (<= 680px) */
+        @media (max-width: 680px) {
             .top-header {
-                height: auto;
-                padding: 18px;
+                padding: 14px 16px 10px;
+                gap: 10px;
             }
 
-            .dashboard {
-                padding: 5px 15px 20px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-right {
-                gap: 8px;
-            }
-
-            .brand {
-                display: none;
+            .header-brand {
+                display: none !important;
             }
 
             .greeting {
-                font-size: 17px;
+                font-size: 1.18rem;
             }
 
             .greeting-sub {
-                font-size: 11px;
+                font-size: 0.78rem;
+            }
+
+            .hamburger-btn {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                border-radius: 12px;
+            }
+
+            .header-icon-btn,
+            .header-avatar {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                border-radius: 11px;
+            }
+
+            .dashboard {
+                padding: 6px 14px calc(95px + var(--safe-bottom));
+            }
+
+            /* On mobile, Fitness Score is full width hero */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .fitness-card {
+                grid-column: 1 / -1;
+                background: linear-gradient(135deg, #FFFFFF 0%, #F0FAFB 100%);
+            }
+
+            .fitness-content {
+                padding: 4px 0;
+            }
+
+            .fitness-score {
+                font-size: 2.1rem;
+            }
+
+            .score-ring {
+                width: 76px;
+                height: 76px;
+                min-width: 76px;
+            }
+
+            .score-ring::after {
+                width: 58px;
+                height: 58px;
+            }
+
+            .stat-value {
+                font-size: 1.85rem;
             }
 
             .card {
-                padding: 20px;
+                padding: 18px 16px;
+                border-radius: 18px;
             }
 
+            .bottom-grid {
+                margin-top: 14px;
+                gap: 14px;
+            }
+
+            /* Body Stats 2-column list on phone for compact view */
+            .body-stats-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .body-row.goal-row {
+                grid-column: 1 / -1;
+            }
+
+            .body-row {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+
+            .body-icon {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 0.95rem;
+            }
+
+            .body-value {
+                font-size: 0.92rem;
+            }
+
+            .body-label {
+                font-size: 0.72rem;
+            }
+
+            /* Heatmap stats compact 3-column */
+            .heatmap-summary {
+                gap: 6px;
+                margin: 10px 0 14px;
+            }
+
+            .heat-stat {
+                padding: 8px 6px;
+                border-radius: 10px;
+                gap: 6px;
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+            }
+
+            .heat-stat span {
+                font-size: 1.2rem;
+            }
+
+            .heat-stat strong {
+                font-size: 0.95rem;
+            }
+
+            .heat-stat small {
+                font-size: 0.68rem;
+            }
+
+            .heatmap {
+                gap: 4px;
+            }
+
+            .heat-cell,
+            .heatmap-cell {
+                min-height: 20px;
+                border-radius: 4px;
+            }
+
+            /* Map height */
+            .activity-map {
+                height: 125px;
+            }
+
+            /* Bottom tabs styling on phone */
+            .bottom-tabs {
+                bottom: calc(10px + var(--safe-bottom));
+                padding: 4px;
+                width: calc(100% - 20px);
+                border-radius: 30px;
+            }
+
+            .bottom-tabs .tab {
+                padding: 7px 10px;
+                font-size: 0.82rem;
+                min-height: 40px;
+                gap: 6px;
+            }
+
+            .bottom-tabs .tab svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Modal phone layout */
             .profile-modal {
-                padding: 22px;
+                padding: 20px 16px;
+                border-radius: 20px;
+                max-height: 85vh;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .modal-actions {
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Small Phone Screen (<= 380px) */
+        @media (max-width: 380px) {
+            .top-header {
+                padding: 10px 12px 8px;
+            }
+
+            .greeting {
+                font-size: 1.05rem;
+            }
+
+            .greeting-sub {
+                font-size: 0.74rem;
+            }
+
+            .dashboard {
+                padding: 4px 10px calc(90px + var(--safe-bottom));
+            }
+
+            .card {
+                padding: 14px 12px;
+                border-radius: 16px;
+            }
+
+            .stat-value {
+                font-size: 1.65rem;
+            }
+
+            .fitness-score {
+                font-size: 1.85rem;
+            }
+
+            .score-ring {
+                width: 66px;
+                height: 66px;
+                min-width: 66px;
+            }
+
+            .score-ring::after {
+                width: 50px;
+                height: 50px;
+            }
+
+            .heat-stat strong {
+                font-size: 0.84rem;
+            }
+
+            .bottom-tabs .tab {
+                padding: 6px 8px;
+                font-size: 0.76rem;
+                gap: 4px;
+            }
+
+            .bottom-tabs .tab svg {
+                width: 15px;
+                height: 15px;
             }
         }
     </style>
@@ -1141,51 +1635,44 @@
 <body>
 
     <!-- =====================================================
-         HEADER
+         TOP HEADER
     ====================================================== -->
-
     <header class="top-header">
 
         <div class="header-left">
+            <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open Navigation Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
 
-            <button
-class="hamburger-btn"
-id="hamburgerBtn"
-type="button">
-☰
-</button>
-
-            <div>
-               <h1 class="greeting" id="greeting">
-    Good Morning, <span id="userName">User</span> ! 👋
-</h1>
-
+            <div class="greeting-wrap">
+                <h1 class="greeting" id="greeting">
+                    Good Morning, <span id="userName">User</span>! 👋
+                </h1>
                 <p class="greeting-sub">
                     Here's your fitness overview
                 </p>
             </div>
-
         </div>
 
-
         <div class="header-right">
-
-            <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 10px;">
-                <div class="sidebar-logo-icon" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00838F, #00BCD4); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="header-brand">
+                <div class="header-brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                 </div>
-                <span style="font-size: 1.3rem; font-weight: 800; color: #0F172A; letter-spacing: -0.03em;">ZENFIT</span>
+                <span class="header-brand-text">ZENFIT</span>
             </div>
 
-            <button
-                class="header-icon-btn"
-                id="notifBtn"
-                type="button"
-                aria-label="Notifications"
-            >
-                ♧
+            <button class="header-icon-btn" id="notifBtn" type="button" aria-label="Notifications">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
                 <span class="notif-dot"></span>
             </button>
 
@@ -1196,711 +1683,406 @@ type="button">
                 tabindex="0"
                 title="Personal Details"
                 onclick="window.location.href='personal_details.html'"
-                style="cursor: pointer;"
             >
                 <span id="headerAvatarText">U</span>
                 <span class="online-dot"></span>
             </div>
-
         </div>
 
     </header>
 
-
     <!-- =====================================================
          MAIN DASHBOARD
     ====================================================== -->
-
     <main class="dashboard">
 
-
         <!-- ================= TOP STATS ================= -->
-
         <section class="stats-grid">
 
-
             <!-- Fitness Score -->
-
             <div class="card fitness-card">
-
                 <div class="card-header">
-
-                    <span class="card-title">
-                        Fitness Score
-                    </span>
-
-                    <span>ⓘ</span>
-
+                    <div class="card-header-left">
+                        <div class="card-icon cyan">
+                            ⚡
+                        </div>
+                        <span class="card-title">Fitness Score</span>
+                    </div>
+                    <span class="info-pill" title="Calculated from your workouts & activity">ⓘ</span>
                 </div>
 
-
                 <div class="fitness-content">
-
                     <div>
-
                         <div class="fitness-score">
                             <span id="fitnessScore">0</span>
                             <span>/100</span>
                         </div>
 
-
                         <div class="score-status">
-
                             <span class="score-dot"></span>
-
-                            <span id="scoreLabel">
-                                No Activity Yet
-                            </span>
-
+                            <span id="scoreLabel">No Activity Yet</span>
                         </div>
-
                     </div>
-
 
                     <div
                         class="score-ring"
                         id="scoreRing"
                         style="--score-degree:0deg"
                     ></div>
-
                 </div>
-
             </div>
 
-
             <!-- Distance -->
-
             <div class="card stat-card">
-
                 <div class="card-header">
-
                     <div class="card-header-left">
-
                         <div class="card-icon blue">
                             ↗
                         </div>
-
-                        <span class="card-title">
-                            Distance
-                        </span>
-
+                        <span class="card-title">Distance</span>
                     </div>
-
                 </div>
-
 
                 <div class="stat-value">
-
-                    <span id="distanceTopValue">
-                        0.0
-                    </span>
-
+                    <span id="distanceTopValue">0.0</span>
                     <span>km</span>
-
                 </div>
-
 
                 <div class="stat-goal">
-                    /5 km
+                    /5 km goal
                 </div>
 
-
                 <div class="progress-container">
-
                     <div
                         class="progress blue"
                         id="distanceProgressBar"
                         style="--progress:0%"
                     ></div>
-
                 </div>
 
-
-                <div
-                    class="progress-label"
-                    id="distanceProgressLabel"
-                >
+                <div class="progress-label" id="distanceProgressLabel">
                     0% of your goal
                 </div>
-
             </div>
 
-
             <!-- Daily Calories -->
-
             <div class="card stat-card">
-
                 <div class="card-header">
-
                     <div class="card-header-left">
-
                         <div class="card-icon orange">
                             🔥
                         </div>
-
-                        <span class="card-title">
-                            Daily Calorie Need
-                        </span>
-
+                        <span class="card-title">Daily Calorie Need</span>
                     </div>
-
                 </div>
-
 
                 <div class="stat-value">
-
-                    <span id="calorieNeedValue">
-                        0
-                    </span>
-
+                    <span id="calorieNeedValue">0</span>
                     <span>kcal</span>
-
                 </div>
-
 
                 <div class="stat-goal">
                     Estimated from profile
                 </div>
 
-
                 <div class="progress-container">
-
                     <div
                         class="progress orange"
                         id="calorieNeedProgressBar"
                         style="--progress:0%"
                     ></div>
-
                 </div>
 
-
-                <div
-                    class="progress-label"
-                    id="calorieNeedProgressLabel"
-                >
+                <div class="progress-label" id="calorieNeedProgressLabel">
                     Complete profile to calculate
                 </div>
-
             </div>
 
-
-            <!-- Workout -->
-
+            <!-- Workout Sessions -->
             <div class="card stat-card">
-
                 <div class="card-header">
-
                     <div class="card-header-left">
-
                         <div class="card-icon cyan">
                             🏋
                         </div>
-
-                        <span class="card-title">
-                            Workout Sessions
-                        </span>
-
+                        <span class="card-title">Workout Sessions</span>
                     </div>
-
                 </div>
-
 
                 <div class="stat-value">
-
-                    <span id="workoutSessionsValue">
-                        0
-                    </span>
-
+                    <span id="workoutSessionsValue">0</span>
+                    <span>sessions</span>
                 </div>
-
 
                 <div class="stat-goal">
                     /5 this week
                 </div>
 
-
                 <div class="progress-container">
-
                     <div
                         class="progress cyan"
                         id="workoutSessionsProgressBar"
                         style="--progress:0%"
                     ></div>
-
                 </div>
 
-
-                <div
-                    class="progress-label"
-                    id="workoutSessionsProgressLabel"
-                >
+                <div class="progress-label" id="workoutSessionsProgressLabel">
                     0% of your goal
                 </div>
-
             </div>
 
         </section>
 
-
-
         <!-- ================= BOTTOM GRID ================= -->
-
         <section class="bottom-grid">
 
-
-            <!-- BODY STATS -->
-
+            <!-- BODY STATS & HEALTH -->
             <div class="card body-stats" onclick="window.location.href='health.html'" style="cursor: pointer;">
-
                 <div class="card-header">
-
-                    <span class="card-title">
-                        Body Stats & Health
-                    </span>
-
-                    <span>›</span>
-
+                    <div class="card-header-left">
+                        <div class="card-icon green">
+                            ❤️
+                        </div>
+                        <span class="card-title">Body Stats & Health</span>
+                    </div>
+                    <span style="font-size: 1.2rem; color: var(--primary-dark); font-weight: 700;">›</span>
                 </div>
 
-
-                <div class="body-row">
-
-                    <div class="body-icon">
-                        ◷
+                <div class="body-stats-list">
+                    <div class="body-row">
+                        <div class="body-icon">⚖️</div>
+                        <div class="body-info">
+                            <div class="body-value" id="bmiValue">--</div>
+                            <div class="body-label">BMI</div>
+                        </div>
                     </div>
 
-                    <div>
-
-                        <div
-                            class="body-value"
-                            id="bmiValue"
-                        >
-                            --
+                    <div class="body-row">
+                        <div class="body-icon">📏</div>
+                        <div class="body-info">
+                            <div class="body-value" id="heightValue">--</div>
+                            <div class="body-label">Height</div>
                         </div>
-
-                        <div class="body-label">
-                            BMI
-                        </div>
-
                     </div>
 
+                    <div class="body-row">
+                        <div class="body-icon">🏋️</div>
+                        <div class="body-info">
+                            <div class="body-value" id="weightValue">--</div>
+                            <div class="body-label">Weight</div>
+                        </div>
+                    </div>
+
+                    <div class="body-row">
+                        <div class="body-icon">🔥</div>
+                        <div class="body-info">
+                            <div class="body-value" id="bmrValue">--</div>
+                            <div class="body-label">BMR</div>
+                        </div>
+                    </div>
+
+                    <div class="body-row goal-row">
+                        <div class="body-icon">🎯</div>
+                        <div class="body-info">
+                            <div class="body-value" id="goalValue">--</div>
+                            <div class="body-label">Goal</div>
+                        </div>
+                    </div>
                 </div>
 
-
-                <div class="body-row">
-
-                    <div class="body-icon">
-                        ↕
-                    </div>
-
-                    <div>
-
-                        <div
-                            class="body-value"
-                            id="heightValue"
-                        >
-                            --
-                        </div>
-
-                        <div class="body-label">
-                            Height
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="body-row">
-
-                    <div class="body-icon">
-                        +
-                    </div>
-
-                    <div>
-
-                        <div
-                            class="body-value"
-                            id="weightValue"
-                        >
-                            --
-                        </div>
-
-                        <div class="body-label">
-                            Weight
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="body-row">
-
-                    <div class="body-icon">
-                        ◷
-                    </div>
-
-                    <div>
-
-                        <div
-                            class="body-value"
-                            id="bmrValue"
-                        >
-                            --
-                        </div>
-
-                        <div class="body-label">
-                            BMR
-                        </div>
-
-                        <div class="body-row">
-
-<div class="body-icon">
-🎯
-</div>
-
-<div>
-
-<div
-class="body-value"
-id="goalValue">
---
-</div>
-
-<div class="body-label">
-Goal
-</div>
-
-</div>
-
-</div>
-
-                    </div>
-
-                </div>
-
-
-               <a 
-href="body_stats.html"
-class="details-btn"
-id="bodyDetailsBtn"
->
-View Details →
-</a>
-
+                <a href="body_stats.html" class="details-btn" id="bodyDetailsBtn" onclick="event.stopPropagation();">
+                    <span>View Details</span>
+                    <span>→</span>
+                </a>
             </div>
 
-
-
-            <!-- HEATMAP -->
-
+            <!-- ACTIVITY HEATMAP -->
             <div class="card heatmap-card">
-
                 <div class="card-header">
-
                     <div class="card-header-left">
-
-                        <span>▣</span>
-
-                        <span class="card-title">
-                            Activity Heatmap
-                        </span>
-
+                        <div class="card-icon purple">
+                            📅
+                        </div>
+                        <span class="card-title">Activity Heatmap</span>
                     </div>
 
-                    <div class="heatmap-summary">
-
-    <div class="heat-stat">
-        <span>🔥</span>
-        <div>
-            <strong id="heatWorkoutDays">0</strong>
-            <small>Workout Days</small>
-        </div>
-    </div>
-
-
-    <div class="heat-stat">
-        <span>📏</span>
-        <div>
-            <strong id="heatDistance">0 km</strong>
-            <small>Total Distance</small>
-        </div>
-    </div>
-
-
-    <div class="heat-stat">
-        <span>⚡</span>
-        <div>
-            <strong id="heatCalories">0</strong>
-            <small>Calories</small>
-        </div>
-    </div>
-
-</div>
-
-
-                    <a
-                        href="athletes.html"
-                        class="see-all"
-                    >
+                    <a href="athletes.html" class="see-all">
                         See All →
                     </a>
-
                 </div>
 
+                <div class="heatmap-summary">
+                    <div class="heat-stat">
+                        <span>🔥</span>
+                        <div class="heat-stat-content">
+                            <strong id="heatWorkoutDays">0</strong>
+                            <small>Workout Days</small>
+                        </div>
+                    </div>
 
-                <div
-                    class="month"
-                    id="heatmapMonth"
-                >
+                    <div class="heat-stat">
+                        <span>📏</span>
+                        <div class="heat-stat-content">
+                            <strong id="heatDistance">0 km</strong>
+                            <small>Total Dist.</small>
+                        </div>
+                    </div>
+
+                    <div class="heat-stat">
+                        <span>⚡</span>
+                        <div class="heat-stat-content">
+                            <strong id="heatCalories">0</strong>
+                            <small>Calories</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="month" id="heatmapMonth">
                     August 2026
                 </div>
 
-
-                <div
-                    class="heatmap"
-                    id="heatmap"
-                ></div>
-
+                <div class="heatmap" id="heatmap"></div>
 
                 <div class="legend">
-
                     <span>Less</span>
-
                     <div class="legend-squares">
-
                         <span class="legend-square l0"></span>
                         <span class="legend-square l1"></span>
                         <span class="legend-square l2"></span>
                         <span class="legend-square l3"></span>
                         <span class="legend-square l4"></span>
-
                     </div>
-
                     <span>More</span>
-
                 </div>
-
             </div>
 
-
-
             <!-- LATEST ACTIVITY -->
-
             <div class="card activity-card">
-
                 <div class="card-header">
-
                     <div class="card-header-left">
-
-                        <span>🏃</span>
-
-                        <span class="card-title">
-                            Latest Activity
-                        </span>
-
+                        <div class="card-icon blue">
+                            🏃
+                        </div>
+                        <span class="card-title">Latest Activity</span>
                     </div>
 
-
-                    <a
-                        href="gps.html"
-                        class="see-all"
-                    >
+                    <a href="gps.html" class="see-all">
                         GPS Tracker →
                     </a>
-
                 </div>
-
 
                 <div
-                    class="activity-map"
-                    id="activityMap"
+                    class="activity-map-wrap"
+                    id="activityMapWrap"
                     title="Click map for GPS Tracking details"
+                    onclick="window.location.href='gps.html'"
                 >
-                    <div class="map-hover-hint">📍 Click map for GPS Tracker ↗</div>
+                    <div class="activity-map" id="activityMap"></div>
+                    <div class="map-hover-hint">📍 Tap for GPS Tracker ↗</div>
                 </div>
-
 
                 <div class="activity-title">
-
-                    <span style="font-size:22px;">
+                    <div class="activity-icon-wrap">
                         🏃
-                    </span>
-
-                    <div>
-
-                        <div
-                            class="activity-name"
-                            id="activityName"
-                        >
+                    </div>
+                    <div class="activity-meta">
+                        <div class="activity-name" id="activityName">
                             No activity yet
                         </div>
-
-                        <div
-                            class="activity-time"
-                            id="activityTime"
-                        >
+                        <div class="activity-time" id="activityTime">
                             Start a workout to see your latest activity
                         </div>
-
                     </div>
-
                 </div>
-
 
                 <div class="activity-stats">
-
                     <div>
-
-                        <div
-                            class="activity-stat-value"
-                            id="activityDistance"
-                        >
-                            0 km
-                        </div>
-
-                        <div class="activity-stat-label">
-                            Distance
-                        </div>
-
+                        <div class="activity-stat-value" id="activityDistance">0 km</div>
+                        <div class="activity-stat-label">Distance</div>
                     </div>
 
-
                     <div>
-
-                        <div
-                            class="activity-stat-value"
-                            id="activityDuration"
-                        >
-                            00:00
-                        </div>
-
-                        <div class="activity-stat-label">
-                            Duration
-                        </div>
-
+                        <div class="activity-stat-value" id="activityDuration">00:00</div>
+                        <div class="activity-stat-label">Duration</div>
                     </div>
 
-
                     <div>
-
-                        <div
-                            class="activity-stat-value"
-                            id="activityCalories"
-                        >
-                            0
-                        </div>
-
-                        <div class="activity-stat-label">
-                            kcal
-                        </div>
-
+                        <div class="activity-stat-value" id="activityCalories">0</div>
+                        <div class="activity-stat-label">kcal</div>
                     </div>
-
                 </div>
 
-
-                <div
-                    class="activity-badge"
-                    id="activityBadge"
-                >
+                <div class="activity-badge" id="activityBadge">
                     No activity yet
                 </div>
-
             </div>
 
         </section>
 
-
-        <!-- ================= BOTTOM NAV ================= -->
-
-        <div class="bottom-tabs">
-          <button class="tab active" id="tab-daily" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <span>Daily</span>
-          </button>
-
-          <button class="tab" id="tab-health" type="button" onclick="window.location.href='health.html'">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            <span>Health</span>
-          </button>
-
-          <button class="tab" id="tab-athletes" type="button" onclick="window.location.href='athletes.html'">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span>Athletes</span>
-          </button>
-        </div>
-
     </main>
 
+    <!-- =====================================================
+         FLOATING BOTTOM NAVIGATION BAR
+    ====================================================== -->
+    <div class="bottom-tabs">
+        <button class="tab active" id="tab-daily" type="button" onclick="window.location.href='dashboard.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <span>Daily</span>
+        </button>
 
+        <button class="tab" id="tab-health" type="button" onclick="window.location.href='health.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span>Health</span>
+        </button>
+
+        <button class="tab" id="tab-athletes" type="button" onclick="window.location.href='athletes.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Athletes</span>
+        </button>
+    </div>
 
     <!-- =====================================================
-         SIDEBAR
+         SIDEBAR NAVIGATION DRAWER
     ====================================================== -->
+    <div class="sidebar-backdrop" id="sidebarOverlay"></div>
 
-   <div
-    class="sidebar-backdrop"
-    id="sidebarOverlay"
-></div>
-
-
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-
-            <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 10px;">
-                <div class="sidebar-logo-icon" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #00838F, #00BCD4); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 14px rgba(0, 188, 212, 0.35);">
+            <div class="sidebar-brand-group">
+                <div class="sidebar-logo-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                 </div>
-                <span style="font-size: 1.3rem; font-weight: 800; color: #0F172A; letter-spacing: -0.03em;">ZENFIT</span>
+                <span class="sidebar-logo-text">ZENFIT</span>
             </div>
 
-
-            <button
-                class="sidebar-close"
-                id="sidebarClose"
-                type="button"
-            >
+            <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close Sidebar">
                 ✕
             </button>
-
         </div>
 
-
         <div class="sidebar-user">
-
-            <div
-                class="sidebar-avatar"
-                id="sidebarAvatar"
-            >
+            <div class="sidebar-avatar" id="sidebarAvatar">
                 U
             </div>
-
-
             <div>
                 <strong id="sidebarUserName" style="display: block; font-size: 0.95rem; font-weight: 700; color: #0F172A;">
                     User
@@ -1909,527 +2091,213 @@ View Details →
                     👑 Pro Member 👋
                 </small>
             </div>
-
         </div>
 
-
         <nav class="sidebar-menu">
-
-            <button
-                class="sidebar-item active"
-                id="menuDashboard"
-                type="button"
-            >
-                🏠
+            <button class="sidebar-item active" id="menuDashboard" type="button">
+                <span>🏠</span>
                 <span>Dashboard</span>
             </button>
 
-
-            <button
-                class="sidebar-item"
-                id="menuProfile"
-                type="button"
-            >
-                👤
+            <button class="sidebar-item" id="menuProfile" type="button">
+                <span>👤</span>
                 <span>Profile</span>
             </button>
 
-
-            <button
-                class="sidebar-item"
-                id="menuHealth"
-                type="button"
-            >
-                ❤️
+            <button class="sidebar-item" id="menuHealth" type="button">
+                <span>❤️</span>
                 <span>Health</span>
             </button>
 
-
-            <button
-                class="sidebar-item"
-                id="menuGPS"
-                type="button"
-                onclick="window.location.href='gps.html'"
-            >
-                📍
+            <button class="sidebar-item" id="menuGPS" type="button" onclick="window.location.href='gps.html'">
+                <span>📍</span>
                 <span>GPS Tracking</span>
             </button>
 
-
-            <button
-                class="sidebar-item"
-                id="menuNutrition"
-                type="button"
-            >
-                🥗
+            <button class="sidebar-item" id="menuNutrition" type="button">
+                <span>🥗</span>
                 <span>Nutrition</span>
             </button>
 
+            <button class="sidebar-item" id="menuWorkout" type="button">
+                <span>🏋</span>
+                <span>Workout</span>
+            </button>
 
-            <button
-    class="sidebar-item"
-    id="menuWorkout"
-    type="button"
->
-    🏋
-    <span>Workout</span>
-</button>
-
-
-
-
-            <button
-                class="sidebar-item"
-                id="menuAthletes"
-                type="button"
-            >
-                🏃
+            <button class="sidebar-item" id="menuAthletes" type="button">
+                <span>🏃</span>
                 <span>Athletes</span>
             </button>
 
-
-            <button
-                class="sidebar-item"
-                id="menuNotifications"
-                type="button"
-            >
-                🔔
+            <button class="sidebar-item" id="menuNotifications" type="button">
+                <span>🔔</span>
                 <span>Notifications</span>
             </button>
-
         </nav>
 
-
         <div class="sidebar-footer">
-
-            <button
-                class="sidebar-item"
-                id="menuReset"
-                type="button"
-            >
-                ↻
+            <button class="sidebar-item" id="menuReset" type="button">
+                <span>↻</span>
                 <span>Reset Dashboard</span>
             </button>
 
+            <button class="sidebar-item logout-btn" id="menuLogout" type="button">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
         </div>
-
-<button
-class="sidebar-item logout-btn"
-id="menuLogout"
-type="button">
-
-🚪
-<span>Logout</span>
-
-</button>
-
-
     </aside>
 
-
-    <div 
-    id="sidebarOverlay"
-    class="sidebar-backdrop">
-</div>
-
-
-
     <!-- =====================================================
-         PROFILE MODAL
+         EDIT PROFILE MODAL
     ====================================================== -->
-
-    <div
-        class="modal-overlay"
-        id="profileModalOverlay"
-    >
-
-        <div
-            class="profile-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="profileModalTitle"
-        >
-
+    <div class="modal-overlay" id="profileModalOverlay">
+        <div class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
             <div class="modal-top">
-
                 <div class="modal-heading">
-
-                    <div
-                        class="modal-avatar"
-                        id="modalAvatar"
-                    >
+                    <div class="modal-avatar" id="modalAvatar">
                         U
                     </div>
-
-
                     <div>
-
-                        <div
-                            class="modal-title"
-                            id="profileModalTitle"
-                        >
+                        <div class="modal-title" id="profileModalTitle">
                             Edit Profile
                         </div>
-
                         <div class="modal-subtitle">
                             Update your account information
                         </div>
-
                     </div>
-
                 </div>
 
-
-                <button
-                    class="modal-close"
-                    id="closeProfileModal"
-                    type="button"
-                    aria-label="Close"
-                >
+                <button class="modal-close" id="closeProfileModal" type="button" aria-label="Close">
                     ✕
                 </button>
-
             </div>
-
-
 
             <!-- FULL NAME -->
-
             <div class="form-group">
-
-                <label
-                    class="form-label"
-                    for="editFullName"
-                >
-                    Full Name
-                </label>
-
-                <input
-                    class="form-input"
-                    type="text"
-                    id="editFullName"
-                    autocomplete="name"
-                    placeholder="Enter your full name"
-                >
-
-                <div
-                    class="error-text"
-                    id="nameError"
-                ></div>
-
+                <label class="form-label" for="editFullName">Full Name</label>
+                <input class="form-input" type="text" id="editFullName" autocomplete="name" placeholder="Enter your full name">
+                <div class="error-text" id="nameError"></div>
             </div>
-
-
 
             <!-- EMAIL -->
-
             <div class="form-group">
-
-                <label
-                    class="form-label"
-                    for="editEmail"
-                >
-                    Email
-                </label>
-
-                <input
-                    class="form-input"
-                    type="email"
-                    id="editEmail"
-                    autocomplete="email"
-                    placeholder="Enter your email"
-                >
-
-                <div
-                    class="error-text"
-                    id="emailError"
-                ></div>
-
+                <label class="form-label" for="editEmail">Email</label>
+                <input class="form-input" type="email" id="editEmail" autocomplete="email" placeholder="Enter your email">
+                <div class="error-text" id="emailError"></div>
             </div>
-
-
 
             <!-- PHONE -->
-
             <div class="form-group">
-
-                <label
-                    class="form-label"
-                    for="editPhone"
-                >
-                    Phone Number
-                </label>
-
-                <input
-                    class="form-input"
-                    type="tel"
-                    id="editPhone"
-                    autocomplete="tel"
-                    placeholder="Enter phone number"
-                >
-
-                <div
-                    class="error-text"
-                    id="phoneError"
-                ></div>
-
+                <label class="form-label" for="editPhone">Phone Number</label>
+                <input class="form-input" type="tel" id="editPhone" autocomplete="tel" placeholder="Enter phone number">
+                <div class="error-text" id="phoneError"></div>
             </div>
 
+            <!-- AGE & GENDER -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="editAge">Age</label>
+                    <input
+                        class="form-input"
+                        type="number"
+                        id="editAge"
+                        min="1"
+                        max="120"
+                        step="1"
+                        onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+                        oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+                        placeholder="Enter age"
+                    >
+                    <div class="error-text" id="ageError"></div>
+                </div>
 
+                <div class="form-group">
+                    <label class="form-label" for="editGender">Gender</label>
+                    <select class="form-input" id="editGender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- HEIGHT & WEIGHT -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="editHeight">Height (cm)</label>
+                    <input
+                        class="form-input"
+                        type="number"
+                        id="editHeight"
+                        min="1"
+                        max="300"
+                        step="0.1"
+                        onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+                        oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+                        placeholder="175"
+                    >
+                    <div class="error-text" id="heightError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="editWeight">Weight (kg)</label>
+                    <input
+                        class="form-input"
+                        type="number"
+                        id="editWeight"
+                        min="1"
+                        max="500"
+                        step="0.1"
+                        onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
+                        oninput="if(this.value < 0) this.value = Math.abs(this.value);"
+                        placeholder="70"
+                    >
+                    <div class="error-text" id="weightError"></div>
+                </div>
+            </div>
+
+            <!-- FITNESS GOAL -->
             <div class="form-group">
-
-<label class="form-label">
-Age
-</label>
-
-<input
-class="form-input"
-type="number"
-id="editAge"
-min="1"
-max="120"
-step="1"
-onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
-oninput="if(this.value < 0) this.value = Math.abs(this.value);"
-placeholder="Enter age">
-
-<div class="error-text" id="ageError"></div>
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">
-Gender
-</label>
-
-<select
-class="form-input"
-id="editGender">
-
-<option value="">
-Select Gender
-</option>
-
-<option value="Male">
-Male
-</option>
-
-<option value="Female">
-Female
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">
-Height (cm)
-</label>
-
-<input
-class="form-input"
-type="number"
-id="editHeight"
-min="1"
-max="300"
-step="0.1"
-onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
-oninput="if(this.value < 0) this.value = Math.abs(this.value);"
-placeholder="175">
-
-<div class="error-text" id="heightError"></div>
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">
-Weight (kg)
-</label>
-
-<input
-class="form-input"
-type="number"
-id="editWeight"
-min="1"
-max="500"
-step="0.1"
-onkeydown="if(event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E') event.preventDefault()"
-oninput="if(this.value < 0) this.value = Math.abs(this.value);"
-placeholder="70">
-
-<div class="error-text" id="weightError"></div>
-
-</div>
-
-
-<div class="form-group">
-
-<label class="form-label">
-Fitness Goal
-</label>
-
-<select
-class="form-input"
-id="editGoal">
-
-<option value="">
-Select Goal
-</option>
-
-<option>
-Weight Loss
-</option>
-
-<option>
-Muscle Gain
-</option>
-
-<option>
-Maintain Fitness
-</option>
-
-</select>
-
-</div>
-
-
+                <label class="form-label" for="editGoal">Fitness Goal</label>
+                <select class="form-input" id="editGoal">
+                    <option value="">Select Goal</option>
+                    <option>Weight Loss</option>
+                    <option>Muscle Gain</option>
+                    <option>Maintain Fitness</option>
+                </select>
+            </div>
 
             <!-- PASSWORD -->
-
             <div class="password-section">
-
-                <div class="password-heading">
-                    Change Password
-                </div>
-
+                <div class="password-heading">Change Password</div>
 
                 <div class="form-group">
-
-                    <label
-                        class="form-label"
-                        for="editPassword"
-                    >
-                        New Password
-                    </label>
-
-                    <input
-                        class="form-input"
-                        type="password"
-                        id="editPassword"
-                        autocomplete="new-password"
-                        placeholder="Leave blank to keep current password"
-                    >
-
-                    <div
-                        class="error-text"
-                        id="passwordError"
-                    ></div>
-
+                    <label class="form-label" for="editPassword">New Password</label>
+                    <input class="form-input" type="password" id="editPassword" autocomplete="new-password" placeholder="Leave blank to keep current password">
+                    <div class="error-text" id="passwordError"></div>
                 </div>
-
 
                 <div class="form-group">
-
-                    <label
-                        class="form-label"
-                        for="editConfirmPassword"
-                    >
-                        Confirm New Password
-                    </label>
-
-                    <input
-                        class="form-input"
-                        type="password"
-                        id="editConfirmPassword"
-                        autocomplete="new-password"
-                        placeholder="Confirm new password"
-                    >
-
-                    <div
-                        class="error-text"
-                        id="confirmPasswordError"
-                    ></div>
-
+                    <label class="form-label" for="editConfirmPassword">Confirm New Password</label>
+                    <input class="form-input" type="password" id="editConfirmPassword" autocomplete="new-password" placeholder="Confirm new password">
+                    <div class="error-text" id="confirmPasswordError"></div>
                 </div>
-
             </div>
 
-
-
-            <div
-                class="save-message"
-                id="saveMessage"
-            >
+            <div class="save-message" id="saveMessage">
                 Profile updated successfully.
             </div>
 
-
-
             <div class="modal-actions">
-
-                <button
-                    class="btn btn-cancel"
-                    id="cancelProfile"
-                    type="button"
-                >
+                <button class="btn btn-cancel" id="cancelProfile" type="button">
                     Cancel
                 </button>
-
-
-                <button
-                    class="btn btn-save"
-                    id="saveProfileChanges"
-                    type="button"
-                >
+                <button class="btn btn-save" id="saveProfileChanges" type="button">
                     Save Changes
                 </button>
-
             </div>
-
         </div>
-
-    </div>
-
-
-
-    <!-- Floating Bottom Navigation Bar -->
-    <div class="bottom-tabs">
-      <button class="tab active" id="tab-daily" onclick="window.location.href='dashboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <span>Daily</span>
-      </button>
-      <button class="tab" id="tab-health" onclick="window.location.href='health.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-        </svg>
-        <span>Health</span>
-      </button>
-      <button class="tab" id="tab-athletes" onclick="window.location.href='athletes.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-        <span>Athletes</span>
-      </button>
     </div>
 
     <!-- Leaflet JS -->
@@ -2437,6 +2305,4 @@ Maintain Fitness
     <script src="js/dashboard.js"></script>
 
 </body>
-
-
 </html>

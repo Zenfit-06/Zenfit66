@@ -26,6 +26,62 @@ function loadProfile(){
 
 const profile=loadProfile();
 
+// Sidebar user info
+const avatarInitials = (profile.name || "User")
+  .split(' ')
+  .filter(Boolean)
+  .map(n => n[0])
+  .join('')
+  .substring(0, 2)
+  .toUpperCase() || 'U';
+
+const sidebarAvatarEl = document.getElementById('sidebarAvatar');
+if (sidebarAvatarEl) sidebarAvatarEl.textContent = avatarInitials;
+
+const headerAvatarTextEl = document.getElementById('headerAvatarText');
+if (headerAvatarTextEl) headerAvatarTextEl.textContent = avatarInitials;
+
+const sidebarNameEl = document.getElementById('sidebarUserName');
+if (sidebarNameEl) sidebarNameEl.textContent = profile.name;
+
+const sidebarBadgeEl = document.getElementById('sidebarUserBadge');
+if (sidebarBadgeEl) sidebarBadgeEl.textContent = '👑 Pro Member 👋';
+
+// Sidebar toggle
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+if (hamburgerBtn) {
+  hamburgerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.body.classList.add('sidebar-open');
+  });
+}
+
+if (sidebarCloseBtn) {
+  sidebarCloseBtn.addEventListener('click', () => {
+    document.body.classList.remove('sidebar-open');
+  });
+}
+
+if (sidebarBackdrop) {
+  sidebarBackdrop.addEventListener('click', () => {
+    document.body.classList.remove('sidebar-open');
+  });
+}
+
+// Logout
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('zenfit_user');
+      window.location.href = 'login.html';
+    }
+  });
+}
+
 const distance=get("zenfitDistance");
 const calories=get("zenfitCalories");
 const workouts=get("zenfitWorkoutSessions");

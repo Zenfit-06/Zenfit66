@@ -273,95 +273,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
  function openSidebar(){
-
     if(sidebar){
         sidebar.classList.add("open");
     }
-
     if(sidebarOverlay){
         sidebarOverlay.classList.add("open");
     }
-
     document.body.classList.add("sidebar-open");
 }
 
-
 function closeSidebar(){
-
     if(sidebar){
         sidebar.classList.remove("open");
     }
-
     if(sidebarOverlay){
         sidebarOverlay.classList.remove("open");
     }
-
     document.body.classList.remove("sidebar-open");
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-
-const menuLogout =
-    $("menuLogout");
-
-
-if(menuLogout){
-
-    menuLogout.addEventListener(
-        "click",
-        function(e){
-
-            e.preventDefault();
-
-
-            const confirmLogout =
-                confirm(
-                    "Are you sure you want to logout?"
-                );
-
-
-            if(!confirmLogout){
-                return;
-            }
-
-document
-.getElementById("menuLogout")
-.onclick=function(){
-
-localStorage.removeItem("zenfit_user");
-
-window.location.href="login.html";
-
-};
-
-        }
-    );
-
-}
-
-
-function closeSidebar() {
-
-    if (sidebar) {
-        sidebar.classList.remove("open");
-    }
-
-
-    if (sidebarOverlay) {
-        sidebarOverlay.classList.remove("open");
-    }
-
-
     if (
         !$("profileModalOverlay") ||
         !$("profileModalOverlay").classList.contains("show")
     ) {
         document.body.style.overflow = "";
     }
+}
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+const menuLogout =
+    $("menuLogout");
+
+if(menuLogout){
+    menuLogout.addEventListener(
+        "click",
+        function(e){
+            e.preventDefault();
+            const confirmLogout =
+                confirm(
+                    "Are you sure you want to logout?"
+                );
+            if(!confirmLogout){
+                return;
+            }
+            localStorage.removeItem("zenfit_user");
+            window.location.href="login.html";
+        }
+    );
 }
 
     if (hamburgerBtn) {
@@ -522,16 +481,17 @@ profile.goal || "";
 
 
     function closeProfileModal() {
-
         if (!profileModalOverlay) {
             return;
         }
-
 
         profileModalOverlay.classList.remove(
             "show"
         );
 
+        document.body.classList.remove(
+            "sidebar-open"
+        );
 
         document.body.style.overflow =
             "";

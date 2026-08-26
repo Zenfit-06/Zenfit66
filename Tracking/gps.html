@@ -17,6 +17,11 @@
             padding: 0;
         }
 
+        :root {
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #F0FAFB;
@@ -424,26 +429,161 @@
             }
         }
 
-        @media (max-width: 650px) {
+        @media (max-width: 680px) {
             .top-header {
                 height: auto;
-                padding: 18px;
+                padding: 14px 16px 10px;
+                gap: 10px;
             }
 
-            .dashboard {
-                padding: 5px 15px 80px;
+            .header-left {
+                gap: 10px;
+                min-width: 0;
+                flex: 1;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .header-left > div {
+                min-width: 0;
+                overflow: hidden;
             }
 
             .greeting {
-                font-size: 18px;
+                font-size: 1.18rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .greeting-sub {
-                font-size: 12px;
+                font-size: 0.78rem;
+                margin-top: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .hamburger-btn {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                border-radius: 12px;
+                font-size: 18px;
+            }
+
+            .header-right {
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
+            .header-right .sidebar-brand-group {
+                display: none !important;
+            }
+
+            .header-icon-btn,
+            .header-avatar {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                border-radius: 11px;
+            }
+
+            .dashboard {
+                padding: 6px 14px calc(95px + var(--safe-bottom, 0px));
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card:last-child {
+                grid-column: 1 / -1;
+            }
+
+            .stat-card {
+                min-height: auto;
+                padding: 14px 12px;
+                border-radius: 16px;
+            }
+
+            .stat-value {
+                font-size: 1.45rem;
+            }
+
+            .stat-goal {
+                font-size: 0.72rem;
+            }
+
+            .card {
+                padding: 16px 14px;
+                border-radius: 18px;
+            }
+
+            /* Bottom tabs styling on phone */
+            .bottom-tabs {
+                bottom: calc(10px + var(--safe-bottom, 0px));
+                padding: 4px;
+                width: calc(100% - 20px);
+                max-width: 400px;
+                border-radius: 30px;
+            }
+
+            .bottom-tabs .tab {
+                padding: 7px 10px;
+                font-size: 0.82rem;
+                min-height: 40px;
+                gap: 6px;
+            }
+
+            .bottom-tabs .tab svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .top-header {
+                padding: 10px 12px 8px;
+            }
+
+            .greeting {
+                font-size: 1.05rem;
+            }
+
+            .greeting-sub {
+                font-size: 0.74rem;
+            }
+
+            .dashboard {
+                padding: 4px 10px calc(90px + var(--safe-bottom, 0px));
+            }
+
+            .card {
+                padding: 14px 10px;
+                border-radius: 16px;
+            }
+
+            .stats-grid {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px 10px;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .bottom-tabs .tab {
+                padding: 6px 8px;
+                font-size: 0.76rem;
+                gap: 4px;
+            }
+
+            .bottom-tabs .tab svg {
+                width: 15px;
+                height: 15px;
             }
         }
     </style>

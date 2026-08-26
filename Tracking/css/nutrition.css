@@ -20,6 +20,8 @@
   --shadow-hover: 0 18px 45px rgba(0, 131, 143, 0.14);
   --radius-lg: 24px;
   --radius-md: 16px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 *, *::before, *::after {
@@ -1909,6 +1911,7 @@ button {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 990;
   width: fit-content;
+  max-width: calc(100vw - 20px);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -1926,6 +1929,7 @@ button {
   border: none;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .tab:hover:not(.active) {
@@ -2017,10 +2021,262 @@ button {
   }
 }
 
+@media (max-width: 650px) {
+  .dashboard-header {
+    padding: 14px 16px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-left {
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .header-left > div {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .hamburger-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex-shrink: 0;
+    border-radius: 12px;
+  }
+
+  .greeting {
+    font-size: 1.18rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .greeting-sub {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: auto;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .header-right .sidebar-brand-group {
+    display: none !important;
+  }
+
+  .header-icon-btn, .header-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex-shrink: 0;
+    border-radius: 11px;
+  }
+
+  .main-content {
+    padding: 6px 14px calc(95px + var(--safe-bottom, 0px));
+  }
+
+  /* Compact 3 Stat Cards */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    padding: 12px 14px;
+    border-radius: 16px;
+    gap: 14px;
+    min-height: auto;
+  }
+
+  .stat-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 1.1rem;
+  }
+
+  .stat-info h3 {
+    font-size: 0.78rem;
+    margin-bottom: 2px;
+  }
+
+  .stat-info h1 {
+    font-size: 1.4rem;
+    line-height: 1.15;
+  }
+
+  .stat-info p {
+    font-size: 0.74rem;
+    margin-top: 2px;
+  }
+
+  /* Section Header Spacing & Typography */
+  .practice-header {
+    margin: 0 auto 16px;
+    padding: 0 4px;
+    text-align: center;
+  }
+
+  .practice-subtag {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .practice-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .practice-desc {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: #475569;
+    font-weight: 450;
+  }
+
+  /* Macros Section Positioning & Size */
+  .macros-overview {
+    padding: 16px 14px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+  }
+
+  .macros-overview-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+
+  .macros-overview-header h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .macros-toggle-group {
+    gap: 4px;
+  }
+
+  .macros-toggle {
+    padding: 4px 10px;
+    font-size: 0.74rem;
+  }
+
+  .macros-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .macro-ring-card {
+    padding: 12px 8px;
+    border-radius: 14px;
+  }
+
+  .ring-container {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 8px;
+  }
+
+  .ring-label {
+    font-size: 0.85rem;
+  }
+
+  .macro-ring-name {
+    font-size: 0.82rem;
+  }
+
+  .macro-ring-amount {
+    font-size: 0.82rem;
+  }
+
+  /* Other Sections Tightened Gaps */
+  .calories-remaining-section {
+    padding: 16px 14px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+  }
+
+  .meal-plan-layout {
+    margin-bottom: 20px;
+  }
+
+  .poses-list {
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .pose-card, .pose-card.reverse {
+    padding: 14px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+
+  .weekly-chart-section {
+    padding: 16px 14px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+  }
+
+  .tips-section {
+    margin-bottom: 20px;
+  }
+
+  .weekly-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .meal-plan-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Bottom Tabs Styling */
+  .bottom-tabs {
+    bottom: calc(10px + var(--safe-bottom, 0px));
+    padding: 4px;
+    width: calc(100% - 20px);
+    max-width: 400px;
+    border-radius: 30px;
+  }
+
+  .tab {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    min-height: 40px;
+    gap: 6px;
+  }
+
+  .tab svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 @media (max-width: 500px) {
   .macros-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 8px;
   }
 
   .tips-grid {
@@ -2028,22 +2284,90 @@ button {
   }
 
   .meal-macros-row {
-    gap: 8px;
+    gap: 6px;
   }
 
   .meal-macro {
-    font-size: 0.75rem;
-    padding: 5px 10px;
+    font-size: 0.72rem;
+    padding: 4px 8px;
   }
 
   .water-glasses {
-    gap: 8px;
+    gap: 6px;
   }
 
   .water-glass {
-    min-width: 56px;
-    padding: 10px 8px;
+    min-width: 52px;
+    padding: 8px 6px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .dashboard-header {
+    padding: 10px 12px 8px;
+  }
+
+  .greeting {
+    font-size: 1.05rem;
+  }
+
+  .greeting-sub {
+    font-size: 0.74rem;
+  }
+
+  .main-content {
+    padding: 4px 10px calc(90px + var(--safe-bottom, 0px));
+  }
+
+  .stat-card {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .stat-info h1 {
+    font-size: 1.25rem;
+  }
+
+  .practice-title {
     font-size: 1.2rem;
+  }
+
+  .macros-overview {
+    padding: 14px 10px;
+  }
+
+  .macros-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .ring-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ring-label {
+    font-size: 0.78rem;
+  }
+
+  .calories-remaining-section {
+    padding: 14px 10px;
+  }
+
+  .weekly-chart-section {
+    padding: 14px 10px;
+  }
+
+  .bottom-tabs .tab {
+    padding: 6px 8px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .bottom-tabs .tab svg {
+    width: 15px;
+    height: 15px;
   }
 }
 

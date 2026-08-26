@@ -19,8 +19,10 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
+    padding: 20px 10px;
 }
 
 /* Background Blur Backdrop Overlay */
@@ -245,5 +247,24 @@ body {
     }
     .profile-card {
         padding: 28px 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .profile-card {
+        padding: 22px 14px;
+        max-width: 95vw;
+    }
+    .details {
+        gap: 10px;
+    }
+    .detail-box {
+        padding: 12px 8px;
+    }
+    .detail-box h3 {
+        font-size: 1.15rem;
+    }
+    #profileName {
+        font-size: 1.35rem;
     }
 }

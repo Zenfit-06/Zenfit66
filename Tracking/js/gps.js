@@ -147,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 maxZoom: 19,
+                subdomains: ["a", "b", "c"],
                 attribution: "© OpenStreetMap contributors"
             }).addTo(map);
 
@@ -157,10 +158,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 lineJoin: "round"
             }).addTo(map);
 
-            // Ensure map recalculates size properly after rendering
-            setTimeout(function () {
-                if (map) map.invalidateSize();
-            }, 100);
+            // Ensure map recalculates size properly after rendering across all device scales & orientations
+            [100, 300, 600, 1200].forEach(function (delay) {
+                setTimeout(function () {
+                    if (map) map.invalidateSize();
+                }, delay);
+            });
 
             // Attempt initial location centering
             if ("geolocation" in navigator) {
@@ -480,4 +483,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initial setups
     initMap();
     renderRecentSessions();
+
+    // Window resize handler for Leaflet responsiveness
+    let mapResizeTimer = null;
+    window.addEventListener("resize", function () {
+        clearTimeout(mapResizeTimer);
+        mapResizeTimer = setTimeout(function () {
+            if (map) map.invalidateSize();
+        }, 150);
+    });
 });

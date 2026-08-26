@@ -937,6 +937,7 @@ body.sidebar-open .sidebar-backdrop {
   padding: 5px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: fit-content;
+  max-width: calc(100vw - 20px);
 }
 
 .tab {
@@ -952,6 +953,7 @@ body.sidebar-open .sidebar-backdrop {
   background: transparent;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .tab:hover:not(.active) {
@@ -1013,6 +1015,10 @@ body.sidebar-open .sidebar-backdrop {
 }
 
 @media (max-width: 640px) {
+  .main-content {
+    padding: 14px 12px 80px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -1022,9 +1028,82 @@ body.sidebar-open .sidebar-backdrop {
   }
 
   .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-left {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .greeting {
+    font-size: 1.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .greeting-sub {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-right .brand {
+    display: none;
+  }
+
+  .stat-card {
+    padding: 16px 18px;
+  }
+
+  .bottom-tabs {
+    bottom: 14px;
+    padding: 4px 6px;
+    gap: 3px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .tab {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .main-content {
+    padding: 12px 8px 75px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+  }
+
+  .greeting {
+    font-size: 1.1rem;
+  }
+
+  .bottom-tabs {
+    bottom: 10px;
+    padding: 3px 4px;
+    gap: 2px;
+    max-width: calc(100vw - 10px);
+  }
+
+  .tab {
+    padding: 7px 8px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .tab svg {
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -1254,4 +1333,60 @@ body.sidebar-open .sidebar-backdrop {
     align-items:center;
     justify-content:center;
     text-decoration:none;
+}
+
+/* Simple Back Arrow in Header (Subpages like Yoga & Nutrition) */
+.header-back-arrow {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+  background: var(--bg-card, #FFFFFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark, #00838F);
+  box-shadow: var(--shadow-sm, 0 2px 10px rgba(0, 131, 143, 0.04));
+  border: 1px solid rgba(0, 188, 212, 0.15);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.header-back-arrow:hover {
+  background: #E0F7FA;
+  color: var(--primary-dark, #00838F);
+  transform: scale(1.03);
+}
+
+.header-back-arrow:active {
+  transform: scale(0.95);
+}
+
+.header-back-arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 680px) {
+  .header-back-arrow {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-back-arrow {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 10px;
+  }
+  .header-back-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
 }

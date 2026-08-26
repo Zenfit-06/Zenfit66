@@ -48,6 +48,11 @@ function setupUserInfo(user) {
   if (sidebarNameEl) {
     sidebarNameEl.textContent = fullName;
   }
+
+  const sidebarBadgeEl = document.getElementById('sidebarUserBadge');
+  if (sidebarBadgeEl) {
+    sidebarBadgeEl.textContent = '👑 Pro Member 👋';
+  }
 }
 
 /* ================= SIDEBAR TOGGLE ================= */

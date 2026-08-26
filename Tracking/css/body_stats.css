@@ -532,44 +532,110 @@ body{
 
 /* RESPONSIVE */
 
-
 @media(max-width:900px){
 
+.header{
+padding:14px 20px;
+gap:16px;
+height:auto;
+}
 
 .container{
-
 padding:20px;
-
 }
-
 
 .profile-card{
-
-
 grid-template-columns:1fr;
-
-
+gap:30px;
 padding:25px;
-
-
 }
-
-
 
 .stats-grid{
-
 grid-template-columns:1fr;
-
 }
-
-
 
 .details-side h2{
-
 font-size:32px;
+}
 
 }
 
+@media(max-width:650px){
+
+.header{
+padding:12px 14px;
+gap:12px;
+}
+
+.header button{
+width:40px;
+height:40px;
+font-size:20px;
+border-radius:12px;
+}
+
+.container{
+padding:14px 10px 40px;
+}
+
+.profile-card{
+padding:20px 14px;
+border-radius:24px;
+gap:24px;
+}
+
+.details-side h2{
+font-size:24px;
+}
+
+.goal{
+font-size:15px;
+margin-bottom:20px;
+}
+
+.stat{
+padding:18px 14px;
+border-radius:18px;
+}
+
+.stat strong{
+font-size:26px;
+}
+
+.progress-box{
+padding:20px 16px;
+border-radius:20px;
+}
+
+.calorie-box{
+padding:20px 16px;
+border-radius:20px;
+}
+
+.calorie-box strong{
+font-size:28px;
+}
+
+}
+
+@media(max-width:380px){
+
+.container{
+padding:10px 8px 30px;
+}
+
+.profile-card{
+padding:16px 10px;
+}
+
+.photo-box{
+width:200px;
+height:200px;
+}
+
+.stat{
+padding:14px 10px;
+}
 
 }
 

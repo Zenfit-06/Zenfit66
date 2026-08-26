@@ -17,6 +17,8 @@
   --shadow-hover: 0 18px 45px rgba(15, 23, 42, 0.12);
   --radius-lg: 24px;
   --radius-md: 16px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 *, *::before, *::after {
@@ -471,5 +473,252 @@ button {
   .pose-image-box {
     width: 100%;
     height: 260px;
+  }
+}
+
+@media (max-width: 650px) {
+  .dashboard-header {
+    padding: 14px 16px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-left {
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .header-left > div {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .hamburger-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex-shrink: 0;
+    border-radius: 12px;
+  }
+
+  .greeting {
+    font-size: 1.18rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .greeting-sub {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: auto;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .header-icon-btn, .header-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex-shrink: 0;
+    border-radius: 11px;
+  }
+
+  .main-content {
+    padding: 6px 14px calc(95px + var(--safe-bottom, 0px));
+  }
+
+  /* Compact 3 Stat Cards */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 12px 14px;
+    border-radius: 16px;
+    gap: 14px;
+    min-height: auto;
+  }
+
+  .stat-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 1.1rem;
+  }
+
+  .stat-info h3 {
+    font-size: 0.78rem;
+    margin-bottom: 2px;
+  }
+
+  .stat-info h1 {
+    font-size: 1.4rem;
+    line-height: 1.15;
+  }
+
+  .stat-info p {
+    font-size: 0.74rem;
+    margin-top: 2px;
+  }
+
+  /* Tightened Gap & Practice Header */
+  .practice-header {
+    margin: 0 auto 18px;
+    padding: 0 4px;
+    text-align: center;
+  }
+
+  .practice-subtag {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .practice-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .practice-desc {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: #475569;
+  }
+
+  /* Poses List & Yoga Images Optimization */
+  .poses-list {
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .pose-card, .pose-card.reverse {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 18px;
+  }
+
+  .pose-image-box {
+    height: 155px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .pose-image-box img {
+    border-radius: 10px;
+  }
+
+  .pose-tag {
+    font-size: 0.72rem;
+    margin-bottom: 4px;
+  }
+
+  .pose-name {
+    font-size: 1.18rem;
+    margin-bottom: 4px;
+  }
+
+  .pose-desc {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  .pose-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-start-practice {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+
+  .btn-pose-info {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  /* Bottom Tabs Styling */
+  .bottom-tabs {
+    bottom: calc(10px + var(--safe-bottom, 0px));
+    padding: 4px;
+    width: calc(100% - 20px);
+    max-width: 400px;
+    border-radius: 30px;
+  }
+
+  .tab {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    min-height: 40px;
+    gap: 6px;
+  }
+
+  .tab i,
+  .tab svg {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 380px) {
+  .dashboard-header {
+    padding: 10px 12px 8px;
+  }
+
+  .greeting {
+    font-size: 1.05rem;
+  }
+
+  .greeting-sub {
+    font-size: 0.74rem;
+  }
+
+  .main-content {
+    padding: 4px 10px calc(90px + var(--safe-bottom, 0px));
+  }
+
+  .stat-card {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .stat-info h1 {
+    font-size: 1.25rem;
+  }
+
+  .practice-title {
+    font-size: 1.2rem;
+  }
+
+  .pose-card, .pose-card.reverse {
+    padding: 12px 10px;
+  }
+
+  .pose-image-box {
+    height: 135px;
+  }
+
+  .bottom-tabs .tab {
+    padding: 6px 8px;
+    font-size: 0.76rem;
+    gap: 4px;
   }
 }
